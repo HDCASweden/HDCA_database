@@ -1,0 +1,7 @@
+name: hdca_website
+
+channels:
+ - conda-forge
+
+dependencies:
+ - r-base>=4
