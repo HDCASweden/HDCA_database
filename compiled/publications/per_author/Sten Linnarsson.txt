@@ -1,0 +1,57 @@
+<p>BRAIN Initiative Cell Census Network (BICCN) . <b>A multimodal cell census and atlas of the mammalian primary motor cortex.</b>
+<a href='https://doi.org/10.1038/s41586-021-03950-0'>Nature</a> (Oct 2021) </p>
+
+<p>Bakken TE, Jorstad NL, Hu Q, Lake BB, Tian W, Kalmbach BE, Crow M, Hodge RD, Krienen FM, Sorensen SA, Eggermont J, Yao Z, Aevermann BD, Aldridge AI, Bartlett A, Bertagnolli D, Casper T, Castanon RG, Crichton K, Daigle TL, Dalley R, Dee N, Dembrow N, Diep D, Ding SL, Dong W, Fang R, Fischer S, Goldman M, Goldy J, Graybuck LT, Herb BR, Hou X, Kancherla J, Kroll M, Lathia K, van Lew B, Li YE, Liu CS, Liu H, Lucero JD, Mahurkar A, McMillen D, Miller JA, Moussa M, Nery JR, Nicovich PR, Niu SY, Orvis J, Osteen JK, Owen S, Palmer CR, Pham T, Plongthongkum N, Poirion O, Reed NM, Rimorin C, Rivkin A, Romanow WJ, Sedeño-Cortés AE, Siletti K, Somasundaram S, Sulc J, Tieu M, Torkelson A, Tung H, Wang X, Xie F, Yanny AM, Zhang R, Ament SA, Behrens MM, Bravo HC, Chun J, Dobin A, Gillis J, Hertzano R, Hof PR, Höllt T, Horwitz GD, Keene CD, Kharchenko PV, Ko AL, Lelieveldt BP, Luo C, Mukamel EA, Pinto-Duarte A, Preissl S, Regev A, Ren B, Scheuermann RH, Smith K, Spain WJ, White OR, Koch C, Hawrylycz M, Tasic B, Macosko EZ, McCarroll SA, Ting JT, Zeng H, Zhang K, Feng G, Ecker JR, <u>Linnarsson S</u>, Lein ES. <b>Comparative cellular analysis of motor cortex in human, marmoset and mouse.</b>
+<a href='https://doi.org/10.1038/s41586-021-03465-8'>Nature</a> (Oct 2021) </p>
+
+<p>Haniffa M, Taylor D, <u>Linnarsson S</u>, Aronow BJ, Bader GD, Barker RA, Camara PG, Camp JG, Chédotal A, Copp A, Etchevers HC, Giacobini P, Göttgens B, Guo G, Hupalowska A, James KR, Kirby E, Kriegstein A, Lundeberg J, Marioni JC, Meyer KB, Niakan KK, Nilsson M, Olabi B, Pe'er D, Regev A, Rood J, Rozenblatt-Rosen O, Satija R, Teichmann SA, Treutlein B, Vento-Tormo R, Webb S, Human Cell Atlas Developmental Biological Network . <b>A roadmap for the Human Developmental Cell Atlas.</b>
+<a href='https://doi.org/10.1038/s41586-021-03620-1'>Nature</a> (Sep 2021) </p>
+
+<p>La Manno G, Siletti K, Furlan A, Gyllborg D, Vinsland E, Mossi Albiach A, Mattsson Langseth C, Khven I, Lederer AR, Dratva LM, Johnsson A, Nilsson M, Lönnerberg P, <u>Linnarsson S</u>. <b>Molecular architecture of the developing mouse brain.</b>
+<a href='https://doi.org/10.1038/s41586-021-03775-x'>Nature</a> (Jul 2021) </p>
+
+<p>Rozenblatt-Rosen O, Shin JW, Rood JE, Hupalowska A, Human Cell Atlas Standards and Technology Working Group , Regev A, Heyn H. <b>Building a high-quality Human Cell Atlas.</b>
+<a href='https://doi.org/10.1038/s41587-020-00812-4'>Nature biotechnology</a> (Jan 2021) </p>
+
+<p>Rajewsky N, Almouzni G, Gorski SA, Aerts S, Amit I, Bertero MG, Bock C, Bredenoord AL, Cavalli G, Chiocca S, Clevers H, De Strooper B, Eggert A, Ellenberg J, Fernández XM, Figlerowicz M, Gasser SM, Hubner N, Kjems J, Knoblich JA, Krabbe G, Lichter P, <u>Linnarsson S</u>, Marine JC, Marioni JC, Marti-Renom MA, Netea MG, Nickel D, Nollmann M, Novak HR, Parkinson H, Piccolo S, Pinheiro I, Pombo A, Popp C, Reik W, Roman-Roman S, Rosenstiel P, Schultze JL, Stegle O, Tanay A, Testa G, Thanos D, Theis FJ, Torres-Padilla ME, Valencia A, Vallot C, van Oudenaarden A, Vidal M, Voet T, LifeTime Community Working Groups . <b>LifeTime and improving European healthcare through cell-based interceptive medicine.</b>
+<a href='https://doi.org/10.1038/s41586-020-2715-9'>Nature</a> (Sep 2020) </p>
+
+<p>Zeisel A, Hochgerner H, Lönnerberg P, Johnsson A, Memic F, van der Zwan J, Häring M, Braun E, Borm LE, La Manno G, Codeluppi S, Furlan A, Lee K, Skene N, Harris KD, Hjerling-Leffler J, Arenas E, Ernfors P, Marklund U, <u>Linnarsson S</u>. <b>Molecular Architecture of the Mouse Nervous System.</b>
+<a href='https://doi.org/10.1016/j.cell.2018.06.021'>Cell</a> (Aug 2018) </p>
+
+<p>La Manno G, Soldatov R, Zeisel A, Braun E, Hochgerner H, Petukhov V, Lidschreiber K, Kastriti ME, Lönnerberg P, Furlan A, Fan J, Borm LE, Liu Z, van Bruggen D, Guo J, He X, Barker R, Sundström E, Castelo-Branco G, Cramer P, Adameyko I, <u>Linnarsson S</u>, Kharchenko PV. <b>RNA velocity of single cells.</b>
+<a href='https://doi.org/10.1038/s41586-018-0414-6'>Nature</a> (Aug 2018) </p>
+
+<p>Lein E, Borm LE, <u>Linnarsson S</u>. <b>The promise of spatial transcriptomics for neuroscience in the era of molecular cell typing.</b>
+<a href='https://doi.org/10.1126/science.aan6827'>Science (New York, N.Y.)</a> (Oct 2017) </p>
+
+<p>Rivetti di Val Cervo P, Romanov RA, Spigolon G, Masini D, Martín-Montañez E, Toledo EM, La Manno G, Feyder M, Pifl C, Ng YH, Sánchez SP, <u>Linnarsson S</u>, Wernig M, Harkany T, Fisone G, Arenas E. <b>Induction of functional dopamine neurons from human astrocytes in vitro and mouse astrocytes in a Parkinson's disease model.</b>
+<a href='https://doi.org/10.1038/nbt.3835'>Nature biotechnology</a> (Apr 2017) </p>
+
+<p>La Manno G, Gyllborg D, Codeluppi S, Nishimura K, Salto C, Zeisel A, Borm LE, Stott SRW, Toledo EM, Villaescusa JC, Lönnerberg P, Ryge J, Barker RA, Arenas E, <u>Linnarsson S</u>. <b>Molecular Diversity of Midbrain Development in Mouse, Human, and Stem Cells.</b>
+<a href='https://doi.org/10.1016/j.cell.2016.09.027'>Cell</a> (Oct 2016) </p>
+
+<p>Petropoulos S, Edsgärd D, Reinius B, Deng Q, Panula SP, Codeluppi S, Reyes AP, <u>Linnarsson S</u>, Sandberg R, Lanner F. <b>Single-Cell RNA-Seq Reveals Lineage and X Chromosome Dynamics in Human Preimplantation Embryos.</b>
+<a href='https://doi.org/10.1016/j.cell.2016.08.009'>Cell</a> (Sep 2016) </p>
+
+<p>Ståhl PL, Salmén F, Vickovic S, Lundmark A, Navarro JF, Magnusson J, Giacomello S, Asp M, Westholm JO, Huss M, Mollbrink A, <u>Linnarsson S</u>, Codeluppi S, Borg Å, Pontén F, Costea PI, Sahlén P, Mulder J, Bergmann O, Lundeberg J, Frisén J. <b>Visualization and analysis of gene expression in tissue sections by spatial transcriptomics.</b>
+<a href='https://doi.org/10.1126/science.aaf2403'>Science (New York, N.Y.)</a> (Jul 2016) </p>
+
+<p>Marques S, Zeisel A, Codeluppi S, van Bruggen D, Mendanha Falcão A, Xiao L, Li H, Häring M, Hochgerner H, Romanov RA, Gyllborg D, Muñoz Manchado A, La Manno G, Lönnerberg P, Floriddia EM, Rezayee F, Ernfors P, Arenas E, Hjerling-Leffler J, Harkany T, Richardson WD, <u>Linnarsson S</u>, Castelo-Branco G. <b>Oligodendrocyte heterogeneity in the mouse juvenile and adult central nervous system.</b>
+<a href='https://doi.org/10.1126/science.aaf6463'>Science (New York, N.Y.)</a> (Jun 2016) </p>
+
+<p>Petropoulos S, Edsgärd D, Reinius B, Deng Q, Panula SP, Codeluppi S, Plaza Reyes A, <u>Linnarsson S</u>, Sandberg R, Lanner F. <b>Single-Cell RNA-Seq Reveals Lineage and X Chromosome Dynamics in Human Preimplantation Embryos.</b>
+<a href='https://doi.org/10.1016/j.cell.2016.03.023'>Cell</a> (Apr 2016) </p>
+
+<p>Fuzik J, Zeisel A, Máté Z, Calvigioni D, Yanagawa Y, Szabó G, <u>Linnarsson S</u>, Harkany T. <b>Integration of electrophysiological recordings with single-cell RNA-seq data identifies neuronal subtypes.</b>
+<a href='https://doi.org/10.1038/nbt.3443'>Nature biotechnology</a> (Dec 2015) </p>
+
+<p><u>Linnarsson S</u>. <b>NEUROSCIENCE. A tree of the human brain.</b>
+<a href='https://doi.org/10.1126/science.aad2792'>Science (New York, N.Y.)</a> (Oct 2015) </p>
+
+<p>Zeisel A, Muñoz-Manchado AB, Codeluppi S, Lönnerberg P, La Manno G, Juréus A, Marques S, Munguba H, He L, Betsholtz C, Rolny C, Castelo-Branco G, Hjerling-Leffler J, <u>Linnarsson S</u>. <b>Brain structure. Cell types in the mouse cortex and hippocampus revealed by single-cell RNA-seq.</b>
+<a href='https://doi.org/10.1126/science.aaa1934'>Science (New York, N.Y.)</a> (Feb 2015) </p>
+
+<p>O'Malley J, Skylaki S, Iwabuchi KA, Chantzoura E, Ruetz T, Johnsson A, Tomlinson SR, <u>Linnarsson S</u>, Kaji K. <b>High-resolution analysis with novel cell-surface markers identifies routes to iPS cells.</b>
+<a href='https://doi.org/10.1038/nature12243'>Nature</a> (Jun 2013) </p>
+

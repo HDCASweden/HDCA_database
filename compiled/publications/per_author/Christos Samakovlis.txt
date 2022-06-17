@@ -1,0 +1,60 @@
+<p>Ahmadvand N, Lingampally A, Khosravi F, Vazquez-Armendariz AI, Rivetti S, Jones MR, Wilhelm J, Herold S, Barreto G, Koepke J, <u>Samakovlis C</u>, Carraro G, Zhang JS, Al Alam D, Bellusci S. <b>Fgfr2b signaling is essential for the maintenance of the alveolar epithelial type 2 lineage during lung homeostasis in mice.</b>
+<a href='https://doi.org/10.1007/s00018-022-04327-w'>Cellular and molecular life sciences : CMLS</a> (May 2022) </p>
+
+<p>Yin W, Liontos A, Koepke J, Ghoul M, Mazzocchi L, Liu X, Lu C, Wu H, Fysikopoulos A, Sountoulidis A, Seeger W, Ruppert C, Günther A, Stainier DYR, <u>Samakovlis C</u>. <b>An essential function for autocrine hedgehog signaling in epithelial proliferation and differentiation in the trachea.</b>
+<a href='https://doi.org/10.1242/dev.199804'>Development (Cambridge, England)</a> (Feb 2022) </p>
+
+<p>Luecken MD, Zaragosi LE, Madissoon E, Sikkema L, Firsova AB, De Domenico E, Kümmerle L, Saglam A, Berg M, Gay ACA, Schniering J, Mayr CH, Abalo XM, Larsson L, Sountoulidis A, Teichmann S, van Eunen K, Koppelman GH, Saeb-Parsy K, Leroy S, Powell P, Sarkans U, Timens W, Lundeberg J, van den Berge M, Nilsson M, Horváth P, Denning J, Papatheodorou I, Schultze J, Schiller HB, Barbry P, Petoukhov I, Misharin AV, Adcock I, von Papen M, Theis FJ, <u>Samakovlis C</u>, Meyer KB, Nawijn MC. <b>The discovAIR project: a roadmap towards the Human Lung Cell Atlas.</b>
+<a href='https://doi.org/10.1183/13993003.02057-2021'>The European respiratory journal</a> (Jan 2022) </p>
+
+<p>Bui LT, Winters NI, Chung MI, Joseph C, Gutierrez AJ, Habermann AC, Adams TS, Schupp JC, Poli S, Peter LM, Taylor CJ, Blackburn JB, Richmond BW, Nicholson AG, Rassl D, Wallace WA, Rosas IO, Jenkins RG, Kaminski N, Kropski JA, Banovich NE, Human Cell Atlas Lung Biological Network . <b>Chronic lung diseases are associated with gene expression programs favoring SARS-CoV-2 entry and severity.</b>
+<a href='https://doi.org/10.1038/s41467-021-24467-0'>Nature communications</a> (Jul 2021) </p>
+
+<p>Muus C, Luecken MD, Eraslan G, Sikkema L, Waghray A, Heimberg G, Kobayashi Y, Vaishnav ED, Subramanian A, Smillie C, Jagadeesh KA, Duong ET, Fiskin E, Torlai Triglia E, Ansari M, Cai P, Lin B, Buchanan J, Chen S, Shu J, Haber AL, Chung H, Montoro DT, Adams T, Aliee H, Allon SJ, Andrusivova Z, Angelidis I, Ashenberg O, Bassler K, Bécavin C, Benhar I, Bergenstråhle J, Bergenstråhle L, Bolt L, Braun E, Bui LT, Callori S, Chaffin M, Chichelnitskiy E, Chiou J, Conlon TM, Cuoco MS, Cuomo ASE, Deprez M, Duclos G, Fine D, Fischer DS, Ghazanfar S, Gillich A, Giotti B, Gould J, Guo M, Gutierrez AJ, Habermann AC, Harvey T, He P, Hou X, Hu L, Hu Y, Jaiswal A, Ji L, Jiang P, Kapellos TS, Kuo CS, Larsson L, Leney-Greene MA, Lim K, Litviňuková M, Ludwig LS, Lukassen S, Luo W, Maatz H, Madissoon E, Mamanova L, Manakongtreecheep K, Leroy S, Mayr CH, Mbano IM, McAdams AM, Nabhan AN, Nyquist SK, Penland L, Poirion OB, Poli S, Qi C, Queen R, Reichart D, Rosas I, Schupp JC, Shea CV, Shi X, Sinha R, Sit RV, Slowikowski K, Slyper M, Smith NP, Sountoulidis A, Strunz M, Sullivan TB, Sun D, Talavera-López C, Tan P, Tantivit J, Travaglini KJ, Tucker NR, Vernon KA, Wadsworth MH, Waldman J, Wang X, Xu K, Yan W, Zhao W, Ziegler CGK, NHLBI LungMap Consortium , Human Cell Atlas Lung Biological Network . <b>Single-cell meta-analysis of SARS-CoV-2 entry genes across tissues and demographics.</b>
+<a href='https://doi.org/10.1038/s41591-020-01227-z'>Nature medicine</a> (Mar 2021) </p>
+
+<p>Bernardes JP, Mishra N, Tran F, Bahmer T, Best L, Blase JI, Bordoni D, Franzenburg J, Geisen U, Josephs-Spaulding J, Köhler P, Künstner A, Rosati E, Aschenbrenner AC, Bacher P, Baran N, Boysen T, Brandt B, Bruse N, Dörr J, Dräger A, Elke G, Ellinghaus D, Fischer J, Forster M, Franke A, Franzenburg S, Frey N, Friedrichs A, Fuß J, Glück A, Hamm J, Hinrichsen F, Hoeppner MP, Imm S, Junker R, Kaiser S, Kan YH, Knoll R, Lange C, Laue G, Lier C, Lindner M, Marinos G, Markewitz R, Nattermann J, Noth R, Pickkers P, Rabe KF, Renz A, Röcken C, Rupp J, Schaffarzyk A, Scheffold A, Schulte-Schrepping J, Schunk D, Skowasch D, Ulas T, Wandinger KP, Wittig M, Zimmermann J, Busch H, Hoyer BF, Kaleta C, Heyckendorf J, Kox M, Rybniker J, Schreiber S, Schultze JL, Rosenstiel P, HCA Lung Biological Network , Deutsche COVID-19 Omics Initiative (DeCOI) . <b>Longitudinal Multi-omics Analyses Identify Responses of Megakaryocytes, Erythroid Cells, and Plasmablasts as Hallmarks of Severe COVID-19.</b>
+<a href='https://doi.org/10.1016/j.immuni.2020.11.017'>Immunity</a> (Dec 2020) </p>
+
+<p>Sountoulidis A, Liontos A, Nguyen HP, Firsova AB, Fysikopoulos A, Qian X, Seeger W, Sundström E, Nilsson M, <u>Samakovlis C</u>. <b>SCRINSHOT enables spatial mapping of cell states in tissue sections with single-cell resolution.</b>
+<a href='https://doi.org/10.1371/journal.pbio.3000675'>PLoS biology</a> (Nov 2020) </p>
+
+<p>Tucker NR, Chaffin M, Bedi KC, Papangeli I, Akkad AD, Arduini A, Hayat S, Eraslan G, Muus C, Bhattacharyya RP, Stegmann CM, Human Cell Atlas Lung Biological Network , Margulies KB, Ellinor PT, Human Cell Atlas Lung Biological Network Consortium Members . <b>Myocyte-Specific Upregulation of ACE2 in Cardiovascular Disease: Implications for SARS-CoV-2-Mediated Myocarditis.</b>
+<a href='https://doi.org/10.1161/CIRCULATIONAHA.120.047911'>Circulation</a> (Aug 2020) </p>
+
+<p>Ziegler CGK, Allon SJ, Nyquist SK, Mbano IM, Miao VN, Tzouanas CN, Cao Y, Yousif AS, Bals J, Hauser BM, Feldman J, Muus C, Wadsworth MH, Kazer SW, Hughes TK, Doran B, Gatter GJ, Vukovic M, Taliaferro F, Mead BE, Guo Z, Wang JP, Gras D, Plaisant M, Ansari M, Angelidis I, Adler H, Sucre JMS, Taylor CJ, Lin B, Waghray A, Mitsialis V, Dwyer DF, Buchheit KM, Boyce JA, Barrett NA, Laidlaw TM, Carroll SL, Colonna L, Tkachev V, Peterson CW, Yu A, Zheng HB, Gideon HP, Winchell CG, Lin PL, Bingle CD, Snapper SB, Kropski JA, Theis FJ, Schiller HB, Zaragosi LE, Barbry P, Leslie A, Kiem HP, Flynn JL, Fortune SM, Berger B, Finberg RW, Kean LS, Garber M, Schmidt AG, Lingwood D, Shalek AK, Ordovas-Montanes J, HCA Lung Biological Network. Electronic address: lung-network@humancellatlas.org , HCA Lung Biological Network . <b>SARS-CoV-2 Receptor ACE2 Is an Interferon-Stimulated Gene in Human Airway Epithelial Cells and Is Detected in Specific Cell Subsets across Tissues.</b>
+<a href='https://doi.org/10.1016/j.cell.2020.04.035'>Cell</a> (May 2020) </p>
+
+<p>Sungnak W, Huang N, Bécavin C, Berg M, Queen R, Litvinukova M, Talavera-López C, Maatz H, Reichart D, Sampaziotis F, Worlock KB, Yoshida M, Barnes JL, HCA Lung Biological Network . <b>SARS-CoV-2 entry factors are highly expressed in nasal epithelial cells together with innate immune genes.</b>
+<a href='https://doi.org/10.1038/s41591-020-0868-6'>Nature medicine</a> (Apr 2020) </p>
+
+<p>Skouloudaki K, Christodoulou I, Khalili D, Tsarouhas V, <u>Samakovlis C</u>, Tomancak P, Knust E, Papadopoulos DK. <b>Yorkie controls tube length and apical barrier integrity during airway development.</b>
+<a href='https://doi.org/10.1083/jcb.201809121'>The Journal of cell biology</a> (Jul 2019) </p>
+
+<p>Tsarouhas V, Liu D, Tsikala G, Fedoseienko A, Zinn K, Matsuda R, Billadeau DD, <u>Samakovlis C</u>. <b>WASH phosphorylation balances endosomal versus cortical actin network integrities during epithelial morphogenesis.</b>
+<a href='https://doi.org/10.1038/s41467-019-10229-6'>Nature communications</a> (May 2019) </p>
+
+<p>Dabral S, Muecke C, Valasarajan C, Schmoranzer M, Wietelmann A, Semenza GL, Meister M, Muley T, Seeger-Nukpezah T, <u>Samakovlis C</u>, Weissmann N, Grimminger F, Seeger W, Savai R, Pullamsetti SS. <b>A RASSF1A-HIF1α loop drives Warburg effect in cancer and pulmonary hypertension.</b>
+<a href='https://doi.org/10.1038/s41467-019-10044-z'>Nature communications</a> (May 2019) </p>
+
+<p>Yao L, Wang S, Westholm JO, Dai Q, Matsuda R, Hosono C, Bray S, Lai EC, <u>Samakovlis C</u>. <b>Genome-wide identification of Grainy head targets in Drosophila reveals regulatory interactions with the POU domain transcription factor Vvl.</b>
+<a href='https://doi.org/10.1242/dev.143297'>Development (Cambridge, England)</a> (Aug 2017) </p>
+
+<p>Matsuda R, Hosono C, <u>Samakovlis C</u>, Saigo K. <b>Multipotent versus differentiated cell fate selection in the developing Drosophila airways.</b>
+<a href='https://doi.org/10.7554/eLife.09646'>eLife</a> (Dec 2015) </p>
+
+<p>Hosono C, Matsuda R, Adryan B, <u>Samakovlis C</u>. <b>Transient junction anisotropies orient annular cell polarization in the Drosophila airway tubes.</b>
+<a href='https://doi.org/10.1038/ncb3267'>Nature cell biology</a> (Nov 2015) </p>
+
+<p>Matsuda R, Hosono C, Saigo K, <u>Samakovlis C</u>. <b>The intersection of the extrinsic hedgehog and WNT/wingless signals with the intrinsic Hox code underpins branching pattern and tube shape diversity in the drosophila airways.</b>
+<a href='https://doi.org/10.1371/journal.pgen.1004929'>PLoS genetics</a> (Jan 2015) </p>
+
+<p>O'Farrell F, Wang S, Katheder N, Rusten TE, <u>Samakovlis C</u>. <b>Two-tiered control of epithelial growth and autophagy by the insulin receptor and the ret-like receptor, stitcher.</b>
+<a href='https://doi.org/10.1371/journal.pbio.1001612'>PLoS biology</a> (Aug 2013) </p>
+
+<p>Krauss-Etschmann S, Bush A, Bellusci S, Brusselle GG, Dahlén SE, Dehmel S, Eickelberg O, Gibson G, Hylkema MN, Knaus P, Königshoff M, Lloyd CM, Macciarini P, Mailleux A, Marsland BJ, Postma DS, Roberts G, <u>Samakovlis C</u>, Stocks J, Vandesompele J, Wjst M, Holloway J. <b>Of flies, mice and men: a systematic approach to understanding the early life origins of chronic lung disease.</b>
+<a href='https://doi.org/10.1136/thoraxjnl-2012-201902'>Thorax</a> (Jul 2012) </p>
+
+<p>Tiklová K, Senti KA, Wang S, Gräslund A, <u>Samakovlis C</u>. <b>Epithelial septate junction assembly relies on melanotransferrin iron binding and endocytosis in Drosophila.</b>
+<a href='https://doi.org/10.1038/ncb2111'>Nature cell biology</a> (Oct 2010) </p>
+
