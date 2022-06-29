@@ -146,12 +146,22 @@ for(i in names(all_info)){
   sel4 <- !grepl("Publisher[ ]Correction|Author[ ]Correction",all_info[[i]]@ArticleTitle)
 
   tmp <- all_info[[i]]
+  xxx <- lapply( c("YearPubmed","MonthPubmed","DayPubmed"),function(x) attr(tmp,x) )
+  xxx <- sapply( 1:length(xxx[[1]]) , function(x){ 
+    paste0(xxx[[1]][x],"-",sprintf("%02d",xxx[[2]][x]),"-",sprintf("%02d",xxx[[3]][x])  ) } )
   filters <- cbind(sel2,sel,sel3,sel4,
+                   DATE=xxx,
                    PMID=tmp@PMID,
                    YEAR=tmp@YearPubmed,
                    IF=res[[i]],
-                   JOURNAL=tmp@Title,
-                   ARTICLE=tmp@ArticleTitle)
+                   JOURNAL=gsub(" [(].*","",tmp@Title),
+                   ARTICLE=tmp@ArticleTitle,
+                   AUTHORS=  sapply(tmp@Author,function(x){ 
+                     x[is.na(x)] <- ""
+                     z <- paste0(x$CollectiveName,paste0(x$LastName," ",x$Initials) )
+                     z  <- paste0(z,collapse = ", ")
+                     return(z)
+                   }) )
   
   sels <- grep( "1", as.logical(filters[,1])*as.logical(filters[,2])*as.logical(filters[,3])*as.logical(filters[,4]) )
   all_pubs[[i]] <- filters[sels,]
@@ -188,9 +198,18 @@ for(i in names(all_info)){
   
   sink() 
   sink(type="message")
-
 }
 ```
+
+
+```{r}
+all_pubs
+
+
+```
+
+
+
 
 
 ```{r}
@@ -228,11 +247,10 @@ library(medrxivr)
 plan(multiprocess, workers=future::availableCores()-1 )
 options(future.globals.maxSize = 1500 * 1024 ^ 2)
 preprint_data_list <- future_lapply(1:10,function(i){
-  options(timeout=10000000)
   return(mx_api_content(
   server = "biorxiv",
-  from_date = as.character(Sys.Date() - 20*i),
-  to_date = as.character(Sys.Date() - 20*(i-1) )))
+  from_date = as.character(Sys.Date() - 10*i),
+  to_date = as.character(Sys.Date() - 10*(i-1) )))
 })
 
 options(timeout = 10003)
@@ -251,6 +269,9 @@ all_pubs2 <- all_pubs2[ ! duplicated(all_pubs2) , ]
 all_pubs2 <- all_pubs2[ as.numeric( all_pubs2$IF ) > 10 , ]
 all_pubs2 <- all_pubs2[ as.numeric( all_pubs2$YEAR ) > 2019 , ]
 all_pubs2 <- all_pubs2[ order( all_pubs2$YEAR , decreasing = T) , ]
+
+dim(all_pubs2)
+
 all_pubs2$JOURNAL
 
 tmp <- all_info[[1]]
@@ -268,8 +289,15 @@ for(i in slotNames(tmp)){
     slot(tmp, i) <- unlist(valll) 
   }
 }
-
 ```
+
+
+
+```{r}
+write.csv(all_pubs2 , "../compiled/publications/paper_news2.csv",row.names = F)
+```
+
+
 
 
 

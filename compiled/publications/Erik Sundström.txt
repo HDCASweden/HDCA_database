@@ -1,0 +1,63 @@
+<p>Li X, <u>Sundström E</u>. <b>Stem Cell Therapies for Central Nervous System Trauma: The 4 Ws-What, When, Where, and Why.</b>
+<a href='https://doi.org/10.1093/stcltm/szab006'>Stem cells translational medicine</a> (Jun 2022) </p>
+
+<p>van Bruggen D, Pohl F, Langseth CM, Kukanja P, Lee H, Albiach AM, Kabbe M, Meijer M, Linnarsson S, Hilscher MM, Nilsson M, <u>Sundström E</u>, Castelo-Branco G. <b>Developmental landscape of human forebrain at a single-cell level identifies early waves of oligodendrogenesis.</b>
+<a href='https://doi.org/10.1016/j.devcel.2022.04.016'>Developmental cell</a> (May 2022) </p>
+
+<p>Xu T, Li X, Guo Y, Uhlin E, Holmberg L, Mitra S, Winn D, Falk A, <u>Sundström E</u>. <b>Multiple therapeutic effects of human neural stem cells derived from induced pluripotent stem cells in a rat model of post-traumatic syringomyelia.</b>
+<a href='https://doi.org/10.1016/j.ebiom.2022.103882'>EBioMedicine</a> (Feb 2022) </p>
+
+<p>Haniffa M, Taylor D, Linnarsson S, Aronow BJ, Bader GD, Barker RA, Camara PG, Camp JG, Chédotal A, Copp A, Etchevers HC, Giacobini P, Göttgens B, Guo G, Hupalowska A, James KR, Kirby E, Kriegstein A, Lundeberg J, Marioni JC, Meyer KB, Niakan KK, Nilsson M, Olabi B, Pe'er D, Regev A, Rood J, Rozenblatt-Rosen O, Satija R, Teichmann SA, Treutlein B, Vento-Tormo R, Webb S, Human Cell Atlas Developmental Biological Network . <b>A roadmap for the Human Developmental Cell Atlas.</b>
+<a href='https://doi.org/10.1038/s41586-021-03620-1'>Nature</a> (Sep 2021) </p>
+
+<p>Kameneva P, V Artemov A, Kastriti ME, <u>Sundström E</u>, Kharchenko PV, Adameyko I. <b>Evolutionary switch in expression of key markers between mouse and human leads to mis-assignment of cell types in developing adrenal medulla.</b>
+<a href='https://doi.org/10.1016/j.ccell.2021.04.009'>Cancer cell</a> (May 2021) </p>
+
+<p>Kameneva P, Artemov AV, Kastriti ME, Faure L, Olsen TK, Otte J, Erickson A, Semsch B, Andersson ER, Ratz M, Frisén J, Tischler AS, de Krijger RR, Bouderlique T, Akkuratova N, Vorontsova M, Gusev O, Fried K, <u>Sundström E</u>, Mei S, Kogner P, Baryawno N, Kharchenko PV, Adameyko I. <b>Single-cell transcriptomics of human embryos identifies multiple sympathoblast lineages with potential implications for neuroblastoma origin.</b>
+<a href='https://doi.org/10.1038/s41588-021-00818-x'>Nature genetics</a> (Apr 2021) </p>
+
+<p>Muus C, Luecken MD, Eraslan G, Sikkema L, Waghray A, Heimberg G, Kobayashi Y, Vaishnav ED, Subramanian A, Smillie C, Jagadeesh KA, Duong ET, Fiskin E, Torlai Triglia E, Ansari M, Cai P, Lin B, Buchanan J, Chen S, Shu J, Haber AL, Chung H, Montoro DT, Adams T, Aliee H, Allon SJ, Andrusivova Z, Angelidis I, Ashenberg O, Bassler K, Bécavin C, Benhar I, Bergenstråhle J, Bergenstråhle L, Bolt L, Braun E, Bui LT, Callori S, Chaffin M, Chichelnitskiy E, Chiou J, Conlon TM, Cuoco MS, Cuomo ASE, Deprez M, Duclos G, Fine D, Fischer DS, Ghazanfar S, Gillich A, Giotti B, Gould J, Guo M, Gutierrez AJ, Habermann AC, Harvey T, He P, Hou X, Hu L, Hu Y, Jaiswal A, Ji L, Jiang P, Kapellos TS, Kuo CS, Larsson L, Leney-Greene MA, Lim K, Litviňuková M, Ludwig LS, Lukassen S, Luo W, Maatz H, Madissoon E, Mamanova L, Manakongtreecheep K, Leroy S, Mayr CH, Mbano IM, McAdams AM, Nabhan AN, Nyquist SK, Penland L, Poirion OB, Poli S, Qi C, Queen R, Reichart D, Rosas I, Schupp JC, Shea CV, Shi X, Sinha R, Sit RV, Slowikowski K, Slyper M, Smith NP, Sountoulidis A, Strunz M, Sullivan TB, Sun D, Talavera-López C, Tan P, Tantivit J, Travaglini KJ, Tucker NR, Vernon KA, Wadsworth MH, Waldman J, Wang X, Xu K, Yan W, Zhao W, Ziegler CGK, NHLBI LungMap Consortium , Human Cell Atlas Lung Biological Network . <b>Single-cell meta-analysis of SARS-CoV-2 entry genes across tissues and demographics.</b>
+<a href='https://doi.org/10.1038/s41591-020-01227-z'>Nature medicine</a> (Mar 2021) </p>
+
+<p>Xu N, Xu T, Mirasol R, Holmberg L, Vincent PH, Li X, Falk A, Benedikz E, Rotstein E, Seiger Å, Åkesson E, Falci S, <u>Sundström E</u>. <b>Transplantation of Human Neural Precursor Cells Reverses Syrinx Growth in a Rat Model of Post-Traumatic Syringomyelia.</b>
+<a href='https://doi.org/10.1007/s13311-020-00987-3'>Neurotherapeutics : the journal of the American Society for Experimental NeuroTherapeutics</a> (Jan 2021) </p>
+
+<p>Sountoulidis A, Liontos A, Nguyen HP, Firsova AB, Fysikopoulos A, Qian X, Seeger W, <u>Sundström E</u>, Nilsson M, Samakovlis C. <b>SCRINSHOT enables spatial mapping of cell states in tissue sections with single-cell resolution.</b>
+<a href='https://doi.org/10.1371/journal.pbio.3000675'>PLoS biology</a> (Nov 2020) </p>
+
+<p>Tucker NR, Chaffin M, Bedi KC, Papangeli I, Akkad AD, Arduini A, Hayat S, Eraslan G, Muus C, Bhattacharyya RP, Stegmann CM, Human Cell Atlas Lung Biological Network , Margulies KB, Ellinor PT, Human Cell Atlas Lung Biological Network Consortium Members . <b>Myocyte-Specific Upregulation of ACE2 in Cardiovascular Disease: Implications for SARS-CoV-2-Mediated Myocarditis.</b>
+<a href='https://doi.org/10.1161/CIRCULATIONAHA.120.047911'>Circulation</a> (Aug 2020) </p>
+
+<p>Asp M, Giacomello S, Larsson L, Wu C, Fürth D, Qian X, Wärdell E, Custodio J, Reimegård J, Salmén F, Österholm C, Ståhl PL, <u>Sundström E</u>, Åkesson E, Bergmann O, Bienko M, Månsson-Broberg A, Nilsson M, Sylvén C, Lundeberg J. <b>A Spatiotemporal Organ-Wide Gene Expression and Cell Atlas of the Developing Human Heart.</b>
+<a href='https://doi.org/10.1016/j.cell.2019.11.025'>Cell</a> (Dec 2019) </p>
+
+<p>Peng C, Furlan A, Zhang MD, Su J, Lübke M, Lönnerberg P, Abdo H, Sontheimer J, <u>Sundström E</u>, Ernfors P. <b>Termination of cell-type specification gene programs by the miR-183 cluster determines the population sizes of low-threshold mechanosensitive neurons.</b>
+<a href='https://doi.org/10.1242/dev.165613'>Development (Cambridge, England)</a> (Aug 2018) </p>
+
+<p>La Manno G, Soldatov R, Zeisel A, Braun E, Hochgerner H, Petukhov V, Lidschreiber K, Kastriti ME, Lönnerberg P, Furlan A, Fan J, Borm LE, Liu Z, van Bruggen D, Guo J, He X, Barker R, <u>Sundström E</u>, Castelo-Branco G, Cramer P, Adameyko I, Linnarsson S, Kharchenko PV. <b>RNA velocity of single cells.</b>
+<a href='https://doi.org/10.1038/s41586-018-0414-6'>Nature</a> (Aug 2018) </p>
+
+<p>Memic F, Knoflach V, Morarach K, Sadler R, Laranjeira C, Hjerling-Leffler J, <u>Sundström E</u>, Pachnis V, Marklund U. <b>Transcription and Signaling Regulators in Developing Neuronal Subtypes of Mouse and Human Enteric Nervous System.</b>
+<a href='https://doi.org/10.1053/j.gastro.2017.10.005'>Gastroenterology</a> (Oct 2017) </p>
+
+<p>Eyjolfsdottir H, Eriksdotter M, Linderoth B, Lind G, Juliusson B, Kusk P, Almkvist O, Andreasen N, Blennow K, Ferreira D, Westman E, Nennesmo I, Karami A, Darreh-Shori T, Kadir A, Nordberg A, <u>Sundström E</u>, Wahlund LO, Wall A, Wiberg M, Winblad B, Seiger Å, Wahlberg L, Almqvist P. <b>Targeted delivery of nerve growth factor to the cholinergic basal forebrain of Alzheimer's disease patients: application of a second-generation encapsulated cell biodelivery device.</b>
+<a href='https://doi.org/10.1186/s13195-016-0195-9'>Alzheimer's research & therapy</a> (Jul 2016) </p>
+
+<p>Memic F, Knoflach V, Sadler R, Tegerstedt G, <u>Sundström E</u>, Guillemot F, Pachnis V, Marklund U. <b>Ascl1 Is Required for the Development of Specific Neuronal Subtypes in the Enteric Nervous System.</b>
+<a href='https://doi.org/10.1523/JNEUROSCI.0202-16.2016'>The Journal of neuroscience : the official journal of the Society for Neuroscience</a> (Apr 2016) </p>
+
+<p>Månsson-Broberg A, Rodin S, Bulatovic I, Ibarra C, Löfling M, Genead R, Wärdell E, Felldin U, Granath C, Alici E, Le Blanc K, Smith CIE, Salašová A, Westgren M, <u>Sundström E</u>, Uhlén P, Arenas E, Sylvén C, Tryggvason K, Corbascio M, Simonson OE, Österholm C, Grinnemo KH. <b>Wnt/β-Catenin Stimulation and Laminins Support Cardiovascular Cell Progenitor Expansion from Human Fetal Cardiac Mesenchymal Stromal Cells.</b>
+<a href='https://doi.org/10.1016/j.stemcr.2016.02.014'>Stem cell reports</a> (Apr 2016) </p>
+
+<p>Gil-Bea F, Akterin S, Persson T, Mateos L, Sandebring A, Avila-Cariño J, Gutierrez-Rodriguez A, <u>Sundström E</u>, Holmgren A, Winblad B, Cedazo-Minguez A. <b>Thioredoxin-80 is a product of alpha-secretase cleavage that inhibits amyloid-beta aggregation and is decreased in Alzheimer's disease brain.</b>
+<a href='https://doi.org/10.1002/emmm.201201462'>EMBO molecular medicine</a> (Aug 2012) </p>
+
+<p>Perale G, Rossi F, Santoro M, Peviani M, Papa S, Llupi D, Torriani P, Micotti E, Previdi S, Cervo L, <u>Sundström E</u>, Boccaccini AR, Masi M, Forloni G, Veglianese P. <b>Multiple drug delivery hydrogel system for spinal cord injury repair strategies.</b>
+<a href='https://doi.org/10.1016/j.jconrel.2011.12.025'>Journal of controlled release : official journal of the Controlled Release Society</a> (Jan 2012) </p>
+
+<p>Wallman L, Åkesson E, Ceric D, Andersson PH, Day K, Hovatta O, Falci S, Laurell T, <u>Sundström E</u>. <b>Biogrid--a microfluidic device for large-scale enzyme-free dissociation of stem cell aggregates.</b>
+<a href='https://doi.org/10.1039/c1lc20316a'>Lab on a chip</a> (Aug 2011) </p>
+
+<p>Marklund U, Hansson EM, <u>Sundström E</u>, de Angelis MH, Przemeck GK, Lendahl U, Muhr J, Ericson J. <b>Domain-specific control of neurogenesis achieved through patterned regulation of Notch ligand expression.</b>
+<a href='https://doi.org/10.1242/dev.036806'>Development (Cambridge, England)</a> (Jan 2010) </p>
+
