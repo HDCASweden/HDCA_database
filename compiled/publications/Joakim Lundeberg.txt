@@ -1,3 +1,9 @@
+<p>Erickson A, He M, Berglund E, Marklund M, Mirzazadeh R, Schultz N, Kvastad L, Andersson A, Bergenstråhle L, Bergenstråhle J, Larsson L, Alonso Galicia L, Shamikh A, Basmaci E, Díaz De Ståhl T, Rajakumar T, Doultsinos D, Thrane K, Ji AL, Khavari PA, Tarish F, Tanoglidi A, Maaskola J, Colling R, Mirtti T, Hamdy FC, Woodcock DJ, Helleday T, Mills IG, Lamb AD, <u>Lundeberg J</u>. <b>Spatially resolved clonal copy number alterations in benign and malignant tissue.</b>
+<a href='https://doi.org/10.1038/s41586-022-05023-2'>Nature</a> (Aug 2022) </p>
+
+<p>Larsson L, Bergenstråhle L, He M, Andrusivova Z, <u>Lundeberg J</u>. <b>SnapShot: Spatial transcriptomics.</b>
+<a href='https://doi.org/10.1016/j.cell.2022.06.002'>Cell</a> (Jul 2022) </p>
+
 <p>Bergenstråhle L, He B, Bergenstråhle J, Abalo X, Mirzazadeh R, Thrane K, Ji AL, Andersson A, Larsson L, Stakenborg N, Boeckxstaens G, Khavari P, Zou J, <u>Lundeberg J</u>, Maaskola J. <b>Super-resolved spatial transcriptomics by deep data fusion.</b>
 <a href='https://doi.org/10.1038/s41587-021-01075-3'>Nature biotechnology</a> (Dec 2021) </p>
 
@@ -18,9 +24,6 @@
 
 <p>Ji AL, Rubin AJ, Thrane K, Jiang S, Reynolds DL, Meyers RM, Guo MG, George BM, Mollbrink A, Bergenstråhle J, Larsson L, Bai Y, Zhu B, Bhaduri A, Meyers JM, Rovira-Clavé X, Hollmig ST, Aasi SZ, Nolan GP, <u>Lundeberg J</u>, Khavari PA. <b>Multimodal Analysis of Composition and Spatial Architecture in Human Squamous Cell Carcinoma.</b>
 <a href='https://doi.org/10.1016/j.cell.2020.08.043'>Cell</a> (Sep 2020) </p>
-
-<p>Tucker NR, Chaffin M, Bedi KC, Papangeli I, Akkad AD, Arduini A, Hayat S, Eraslan G, Muus C, Bhattacharyya RP, Stegmann CM, Human Cell Atlas Lung Biological Network , Margulies KB, Ellinor PT, Human Cell Atlas Lung Biological Network Consortium Members . <b>Myocyte-Specific Upregulation of ACE2 in Cardiovascular Disease: Implications for SARS-CoV-2-Mediated Myocarditis.</b>
-<a href='https://doi.org/10.1161/CIRCULATIONAHA.120.047911'>Circulation</a> (Aug 2020) </p>
 
 <p>Chen WT, Lu A, Craessaerts K, Pavie B, Sala Frigerio C, Corthout N, Qian X, Laláková J, Kühnemund M, Voytyuk I, Wolfs L, Mancuso R, Salta E, Balusu S, Snellinx A, Munck S, Jurek A, Fernandez Navarro J, Saido TC, Huitinga I, <u>Lundeberg J</u>, Fiers M, De Strooper B. <b>Spatial Transcriptomics and In Situ Sequencing to Study Alzheimer's Disease.</b>
 <a href='https://doi.org/10.1016/j.cell.2020.06.038'>Cell</a> (Jul 2020) </p>
@@ -54,7 +57,4 @@
 
 <p>Nystedt B, Street NR, Wetterbom A, Zuccolo A, Lin YC, Scofield DG, Vezzi F, Delhomme N, Giacomello S, Alexeyenko A, Vicedomini R, Sahlin K, Sherwood E, Elfstrand M, Gramzow L, Holmberg K, Hällman J, Keech O, Klasson L, Koriabine M, Kucukoglu M, Käller M, Luthman J, Lysholm F, Niittylä T, Olson A, Rilakovic N, Ritland C, Rosselló JA, Sena J, Svensson T, Talavera-López C, Theißen G, Tuominen H, Vanneste K, Wu ZQ, Zhang B, Zerbe P, Arvestad L, Bhalerao R, Bohlmann J, Bousquet J, Garcia Gil R, Hvidsten TR, de Jong P, MacKay J, Morgante M, Ritland K, Sundberg B, Thompson SL, Van de Peer Y, Andersson B, Nilsson O, Ingvarsson PK, <u>Lundeberg J</u>, Jansson S. <b>The Norway spruce genome sequence and conifer genome evolution.</b>
 <a href='https://doi.org/10.1038/nature12211'>Nature</a> (May 2013) </p>
-
-<p>Ståhl PL, <u>Lundeberg J</u>. <b>Toward the single-hour high-quality genome.</b>
-<a href='https://doi.org/10.1146/annurev-biochem-060410-094158'>Annual review of biochemistry</a> (Mar 2012) </p>
 

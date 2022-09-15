@@ -21,14 +21,14 @@ library(future.apply)
 # Query data from Pubmed
 
 ```{r}
-# search_topic <- EUtilsQuery("Nilsson Mats") 
-# search_query <- EUtilsSummary(url = search_topic,type="efetch",db="pubmed")
-# summary(search_query)
-# search_query@querytranslation <- '("Nilsson Mats"[Full Author Name])'
-# 
-# records <- EUtilsGet(search_query)
-# EUt
-# records@Query
+search_topic <- EUtilsQuery("Nilsson Mats")
+search_query <- EUtilsSummary(url = search_topic,type="efetch",db="pubmed")
+summary(search_query)
+search_query@querytranslation <- '("Nilsson Mats"[Full Author Name])'
+
+records <- EUtilsGet(search_query)
+EUt
+records@Query
 # 
 # ?EUtilsQuery
 # search_query@querytranslation
@@ -84,7 +84,8 @@ terms <- c('Joakim Lundeberg',
            'Erik Sundström')
 # terms <- c('Czarnewski')
 
-all_info <- future_lapply(terms , function(x){
+plan(sequential, workers=future::availableCores() )
+all_info <- lapply(terms , function(x){
   message(paste0('processing:\t',x))
   x <- fix_names(x)
   # search_topic <- EUtilsQuery(x) 
@@ -227,38 +228,38 @@ all_pubs
 # 
 # res <- scholar::get_publications(id = 'kDUHVMIAAAAJ')
 
-
-baseurl <- 'https://api.biorxiv.org/details/biorxiv/'
-download.file(
-  url = paste0(baseurl,Sys.Date() - 30*6,'/',Sys.Date(),''),
-  destfile = '../data/tmp.txt')
-
-res <- jsonlite::fromJSON('../data/tmp.txt')$collection
-dim(res)
+# 
+# baseurl <- 'https://api.biorxiv.org/details/biorxiv/'
+# download.file(
+#   url = paste0(baseurl,Sys.Date() - 30*6,'/',Sys.Date(),''),
+#   destfile = '../data/tmp.txt')
+# 
+# res <- jsonlite::fromJSON('../data/tmp.txt')$collection
+# dim(res)
 
 ```
 
 
 
 ```{r}
-library(medrxivr)
-
-
-plan(multiprocess, workers=future::availableCores()-1 )
-options(future.globals.maxSize = 1500 * 1024 ^ 2)
-preprint_data_list <- future_lapply(1:10,function(i){
-  return(mx_api_content(
-  server = "biorxiv",
-  from_date = as.character(Sys.Date() - 10*i),
-  to_date = as.character(Sys.Date() - 10*(i-1) )))
-})
-
-options(timeout = 10003)
-
-terms_use <- c("Lundeberg, J[.]","Lundberg, E[.]","Nilsson, M[.]","Linnarsson, S[.]","Samakovlis, C[.]","Sundström, E[.]"  )
-res <- preprint_data [ grepl( paste0(terms_use,collapse = "|") , preprint_data$authors) ,]
-res$authors
-res$date
+# library(medrxivr)
+# 
+# 
+# plan(multiprocess, workers=future::availableCores()-1 )
+# options(future.globals.maxSize = 1500 * 1024 ^ 2)
+# preprint_data_list <- future_lapply(1:10,function(i){
+#   return(mx_api_content(
+#   server = "biorxiv",
+#   from_date = as.character(Sys.Date() - 10*i),
+#   to_date = as.character(Sys.Date() - 10*(i-1) )))
+# })
+# 
+# options(timeout = 10003)
+# 
+# terms_use <- c("Lundeberg, J[.]","Lundberg, E[.]","Nilsson, M[.]","Linnarsson, S[.]","Samakovlis, C[.]","Sundström, E[.]"  )
+# res <- preprint_data [ grepl( paste0(terms_use,collapse = "|") , preprint_data$authors) ,]
+# res$authors
+# res$date
 ```
 
 

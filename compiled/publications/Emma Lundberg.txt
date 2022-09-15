@@ -25,7 +25,7 @@
 <p>Pinkard H, Stuurman N, Ivanov IE, Anthony NM, Ouyang W, Li B, Yang B, Tsuchida MA, Chhun B, Zhang G, Mei R, Anderson M, Shepherd DP, Hunt-Isaak I, Dunn RL, Jahr W, Kato S, Royer LA, Thiagarajah JR, Eliceiri KW, <u>Lundberg E</u>, Mehta SB, Waller L. <b>Pycro-Manager: open-source software for customized and reproducible microscope control.</b>
 <a href='https://doi.org/10.1038/s41592-021-01087-6'>Nature methods</a> (Mar 2021) </p>
 
-<p>Mahdessian D, Cesnik AJ, Gnann C, Danielsson F, Stenström L, Arif M, Zhang C, Le T, Johansson F, Shutten R, Bäckström A, Axelsson U, Thul P, Cho NH, Carja O, Uhlén M, Mardinoglu A, Stadler C, Lindskog C, Ayoglu B, Leonetti MD, Pontén F, Sullivan DP, <u>Lundberg E</u>. <b>Spatiotemporal dissection of the cell cycle with single-cell proteogenomics.</b>
+<p>Mahdessian D, Cesnik AJ, Gnann C, Danielsson F, Stenström L, Arif M, Zhang C, Le T, Johansson F, Schutten R, Bäckström A, Axelsson U, Thul P, Cho NH, Carja O, Uhlén M, Mardinoglu A, Stadler C, Lindskog C, Ayoglu B, Leonetti MD, Pontén F, Sullivan DP, <u>Lundberg E</u>. <b>Spatiotemporal dissection of the cell cycle with single-cell proteogenomics.</b>
 <a href='https://doi.org/10.1038/s41586-021-03232-9'>Nature</a> (Feb 2021) </p>
 
 <p>Rozenblatt-Rosen O, Shin JW, Rood JE, Hupalowska A, Human Cell Atlas Standards and Technology Working Group , Regev A, Heyn H. <b>Building a high-quality Human Cell Atlas.</b>
