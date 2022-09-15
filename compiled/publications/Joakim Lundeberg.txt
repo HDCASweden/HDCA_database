@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p>Erickson A, He M, Berglund E, Marklund M, Mirzazadeh R, Schultz N, Kvastad L, Andersson A, Bergenstråhle L, Bergenstråhle J, Larsson L, Alonso Galicia L, Shamikh A, Basmaci E, Díaz De Ståhl T, Rajakumar T, Doultsinos D, Thrane K, Ji AL, Khavari PA, Tarish F, Tanoglidi A, Maaskola J, Colling R, Mirtti T, Hamdy FC, Woodcock DJ, Helleday T, Mills IG, Lamb AD, <u>Lundeberg J</u>. <b>Spatially resolved clonal copy number alterations in benign and malignant tissue.</b>
 <a href='https://doi.org/10.1038/s41586-022-05023-2'>Nature</a> (Aug 2022) </p>
 
@@ -58,3 +59,5 @@
 <p>Nystedt B, Street NR, Wetterbom A, Zuccolo A, Lin YC, Scofield DG, Vezzi F, Delhomme N, Giacomello S, Alexeyenko A, Vicedomini R, Sahlin K, Sherwood E, Elfstrand M, Gramzow L, Holmberg K, Hällman J, Keech O, Klasson L, Koriabine M, Kucukoglu M, Käller M, Luthman J, Lysholm F, Niittylä T, Olson A, Rilakovic N, Ritland C, Rosselló JA, Sena J, Svensson T, Talavera-López C, Theißen G, Tuominen H, Vanneste K, Wu ZQ, Zhang B, Zerbe P, Arvestad L, Bhalerao R, Bohlmann J, Bousquet J, Garcia Gil R, Hvidsten TR, de Jong P, MacKay J, Morgante M, Ritland K, Sundberg B, Thompson SL, Van de Peer Y, Andersson B, Nilsson O, Ingvarsson PK, <u>Lundeberg J</u>, Jansson S. <b>The Norway spruce genome sequence and conifer genome evolution.</b>
 <a href='https://doi.org/10.1038/nature12211'>Nature</a> (May 2013) </p>
 
+=======
+>>>>>>> 84d3997c79a9d81d62d30050c548284ac5aa71e9

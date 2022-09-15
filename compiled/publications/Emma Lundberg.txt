@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p>Mund A, Coscia F, Kriston A, Hollandi R, Kovács F, Brunner AD, Migh E, Schweizer L, Santos A, Bzorek M, Naimy S, Rahbek-Gjerdrum LM, Dyring-Andersen B, Bulkescher J, Lukas C, Eckert MA, Lengyel E, Gnann C, <u>Lundberg E</u>, Horvath P, Mann M. <b>Deep Visual Proteomics defines single-cell identity and heterogeneity.</b>
 <a href='https://doi.org/10.1038/s41587-022-01302-5'>Nature biotechnology</a> (May 2022) </p>
 
@@ -70,3 +71,5 @@
 <p>Uhlen M, Oksvold P, Fagerberg L, <u>Lundberg E</u>, Jonasson K, Forsberg M, Zwahlen M, Kampf C, Wester K, Hober S, Wernerus H, Björling L, Ponten F. <b>Towards a knowledge-based Human Protein Atlas.</b>
 <a href='https://doi.org/10.1038/nbt1210-1248'>Nature biotechnology</a> (Dec 2010) </p>
 
+=======
+>>>>>>> 84d3997c79a9d81d62d30050c548284ac5aa71e9

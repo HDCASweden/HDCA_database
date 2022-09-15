@@ -1,19 +1,6 @@
----
-output: html_document
-editor_options: 
-  chunk_output_type: console
----
+#!/home/ubuntu/opt/R/bin/Rscript
 
-
-
-# Load libraries
-
-
-```{r}
-# remotes::install_github("skoval/RISmed")
 library(RISmed)
-library(beeswarm)
-library(niceRplots)
 library(future)
 library(future.apply)
 ```
@@ -29,33 +16,30 @@ search_query@querytranslation <- '("Nilsson Mats"[Full Author Name])'
 records <- EUtilsGet(search_query)
 EUt
 records@Query
-# 
+#
 # ?EUtilsQuery
 # search_query@querytranslation
-# 
+#
 # RISmed::Title(records)
 # RISmed::Title(QueryId(search_query))
 # str(records)
-# 
+#
 # for(i in slotNames(records)){print(slot(object = records,name = i))}
 
 
-```
 
 
 # Get journal Impact Factor
+IF <- as.data.frame(readxl::read_xlsx("../data/latestJCRlist2022.xlsx"))
+print(head(IF))
+#colnames(IF) <- IF[1,]
+#IF <- IF[-1,]
+IF$journal_name <- casefold(IF$journal_name)
+print(head(IF))
 
-```{r}
-IF <- as.data.frame(readxl::read_xlsx("../data/2020ImpactFactordetail.xlsx"))
-colnames(IF) <- IF[1,]
-IF <- IF[-1,]
-IF$`Full Journal Title` <- casefold(IF$`Full Journal Title`)
-head(IF)
-```
+
 
 # Function to format article list
-
-```{r}
 reformat_journal_name <- function(journals){
   journals <- casefold(journals)
   journals <- gsub(" [(:.;].*","",journals)
@@ -71,11 +55,10 @@ fix_names <-  function(x){
   x <- gsub("[[:punct:]]","",x)
   return(x)
 }
-```
+
+
 
 # Match IF for each publication
-
-```{r}
 terms <- c('Joakim Lundeberg',
            'Emma Lundberg',
            'Mats Nilsson',
@@ -88,7 +71,7 @@ plan(sequential, workers=future::availableCores() )
 all_info <- lapply(terms , function(x){
   message(paste0('processing:\t',x))
   x <- fix_names(x)
-  # search_topic <- EUtilsQuery(x) 
+  # search_topic <- EUtilsQuery(x)
   search_query <- EUtilsSummary(x)
   records <- EUtilsGet(search_query)
   return(records)
@@ -99,56 +82,34 @@ names(all_info) <- terms
 res <- lapply(all_info , function(x){
   journals <- reformat_journal_name(x@Title)
   print(journals)
-  xxx <- as.numeric(IF$`Journal Impact Factor`[ match( journals , IF$`Full Journal Title` ) ])
+  xxx <- as.numeric(IF$if_2022[ match( journals , IF$journal_name ) ])
   return( setNames( xxx , journals )  )
 })
 names(res) <- terms
-```
 
 
 
-```{r}
-ifs <- t(as.matrix(unlist(res)))
-rownames(ifs) <- "IF"
-pis <- sub( "[.].*" , "" , colnames(ifs) )
 
-violins( data = ifs,
-         genes = rownames(ifs),
-         clustering = factor(pis),
-         transparency = 50,
-         pt.col = "black",
-         srt=35,
-         smooth = 1)
-
-par(mar=c(10,4,2,1))
-beeswarm(c(ifs) ~ pis, cex=.2, pwcol = (1:30) [ factor(pis) ] ,las=2,xlab="",ylab="IF")
-abline(h=10,lty=2,col="grey")
-```
-
-
-
-```{r}
 min_if <- 5
 year_cutoff <- 2010
 topN <- 20
 all_pubs <- list()
 
-i='Emma Lundberg'
 
 for(i in names(all_info)){
   message(paste0("Proscessing: ",i))
 
   sel2 <- all_info[[i]]@YearPubmed >= year_cutoff
-  
+
   if_cutoff <- sort(res[[i]][sel2],decreasing = T)[ topN ]
-  
+
   sel <- res[[i]] >= if_cutoff
   sel3 <- res[[i]] >= min_if
   sel4 <- !grepl("Publisher[ ]Correction|Author[ ]Correction",all_info[[i]]@ArticleTitle)
 
   tmp <- all_info[[i]]
   xxx <- lapply( c("YearPubmed","MonthPubmed","DayPubmed"),function(x) attr(tmp,x) )
-  xxx <- sapply( 1:length(xxx[[1]]) , function(x){ 
+  xxx <- sapply( 1:length(xxx[[1]]) , function(x){
     paste0(xxx[[1]][x],"-",sprintf("%02d",xxx[[2]][x]),"-",sprintf("%02d",xxx[[3]][x])  ) } )
   filters <- cbind(sel2,sel,sel3,sel4,
                    DATE=xxx,
@@ -157,13 +118,13 @@ for(i in names(all_info)){
                    IF=res[[i]],
                    JOURNAL=gsub(" [(].*","",tmp@Title),
                    ARTICLE=tmp@ArticleTitle,
-                   AUTHORS=  sapply(tmp@Author,function(x){ 
+                   AUTHORS=  sapply(tmp@Author,function(x){
                      x[is.na(x)] <- ""
                      z <- paste0(x$CollectiveName,paste0(x$LastName," ",x$Initials) )
                      z  <- paste0(z,collapse = ", ")
                      return(z)
                    }) )
-  
+
   sels <- grep( "1", as.logical(filters[,1])*as.logical(filters[,2])*as.logical(filters[,3])*as.logical(filters[,4]) )
   all_pubs[[i]] <- filters[sels,]
 
@@ -176,13 +137,13 @@ for(i in names(all_info)){
     tmp2 <- tmp@Author[[k]]
     tmp2[is.na(tmp2)] <- ""
     tmp2$LastName <- paste0(tmp2$CollectiveName,tmp2$LastName)
-    
+
     x <- paste0(paste0( tmp2$LastName ," ", tmp2$Initials ,collapse = ", "),". ")
     x1 <- paste0(sub(".* ","",i), " ", substring(sub(" .*","",i), 1, 1) )
     if( grepl( paste0(x1,"[,.] "), x ) ){
       x <- gsub(x1 , paste0("<u>",x1,"</u>"), x)
     }
-    
+
     cat( "<p>" )
     cat( paste0( x ) )
     cat( paste0("<b>", tmp@ArticleTitle[[j]],"</b>") )
@@ -191,13 +152,13 @@ for(i in names(all_info)){
     cat( paste0( tmp@Title[[j]]) )
     cat( "</a>" )
     cat( paste0( " (" , month.abb[ tmp@MonthPubmed[[j]] ]," ", tmp@YearPubmed[[j]],") " ) )
-    
+
     cat( "</p>" )
     cat( "\n\n" )
 
   }
-  
-  sink() 
+
+  sink()
   sink(type="message")
 }
 ```
@@ -216,35 +177,34 @@ all_pubs
 ```{r}
 # install.packages('scholar')
 # library(scholar)
-# 
+#
 # terms <- c(JoakimLundeberg='kDUHVMIAAAAJ',
 #            EmmaLundberg='yHnDnvcAAAAJ',
 #            MatsNilsson='M6g0gRsAAAAJ',
 #            StenLinnarsson='Bk1l6V0AAAAJ',
 #            ChristosSamakovlis='xYqJw8wAAAAJ',
 #            ErikSundström='')
-# 
-# 
-# 
+#
+#
+#
 # res <- scholar::get_publications(id = 'kDUHVMIAAAAJ')
 
-# 
+#
 # baseurl <- 'https://api.biorxiv.org/details/biorxiv/'
 # download.file(
 #   url = paste0(baseurl,Sys.Date() - 30*6,'/',Sys.Date(),''),
 #   destfile = '../data/tmp.txt')
-# 
+#
 # res <- jsonlite::fromJSON('../data/tmp.txt')$collection
 # dim(res)
 
-```
 
 
 
 ```{r}
 # library(medrxivr)
-# 
-# 
+#
+#
 # plan(multiprocess, workers=future::availableCores()-1 )
 # options(future.globals.maxSize = 1500 * 1024 ^ 2)
 # preprint_data_list <- future_lapply(1:10,function(i){
@@ -253,9 +213,9 @@ all_pubs
 #   from_date = as.character(Sys.Date() - 10*i),
 #   to_date = as.character(Sys.Date() - 10*(i-1) )))
 # })
-# 
+#
 # options(timeout = 10003)
-# 
+#
 # terms_use <- c("Lundeberg, J[.]","Lundberg, E[.]","Nilsson, M[.]","Linnarsson, S[.]","Samakovlis, C[.]","Sundström, E[.]"  )
 # res <- preprint_data [ grepl( paste0(terms_use,collapse = "|") , preprint_data$authors) ,]
 # res$authors
@@ -278,64 +238,23 @@ all_pubs2$JOURNAL
 tmp <- all_info[[1]]
 for(i in slotNames(tmp)){
   valll <- lapply(all_info ,i=i, function(x,i) return(slot(x,i)))
-  
+
   print(typeof(slot(tmp,i) ))
   print(typeof(valll[[1]]))
-  
+
   if( is.list( valll[[1]] ) ){
     valll <- do.call(c,valll)
     names(valll) <- sub(".*[.]","",names(valll))
     slot(tmp, i) <- valll
   } else {
-    slot(tmp, i) <- unlist(valll) 
+    slot(tmp, i) <- unlist(valll)
   }
 }
-```
-
-
-
-```{r}
 write.csv(all_pubs2 , "../compiled/publications/paper_news2.csv",row.names = F)
-```
 
 
 
 
-
-# HDCA News
-
-```{r}
-con <- file(paste0('Preprints_News.txt'))
-sink(con,append=TRUE)
-sink(con,append=TRUE,type="message")
-  cat( "<h3>RECENT PREPRINTS</h3>\n\n" )
-for(i in nrow(res):1 ){
-
-  cat( "<p>" )
-  cat( paste0("<b>", res$date[i],"</b>\n")  )
-  cat( paste0("<b>", "BioRxiv","</b>. ") )
-  cat( paste0("<a href='https://doi.org/",res$doi[i],"'>") )
-  cat( paste0( res$title[i] ) )
-  cat( "</a>" )
-  # cat( paste0( " (" , format(as.POSIXct(res$date[i]),"%b") ," ", format(as.POSIXct(res$date[i]),"%Y") ,") " ) )
-  
-  # cat( "\n" )
-  x <- gsub( "[;]",",",  gsub( "[.,]","", res$authors[i] ))
-  cat( paste0(". ", x ) )
-  cat( "</p>" )
-
-  cat( "\n\n" )
-  # cat( "<hr>" )
-  # cat( "\n\n" )
-}
-  cat( "<hr>" )
-  cat( "\n\n" )
-sink() 
-sink(type="message")
-```
-
-
-```{r}
 con <- file(paste0('../compiled/publications/paper_news.txt'))
 sink(con,append=TRUE)
 sink(con,append=TRUE,type="message")
@@ -350,11 +269,11 @@ for(j in match( all_pubs2$PMID , tmp@PMID ) ){
   cat( paste0( tmp@ArticleTitle[[j]] ) )
   cat( "</a>" )
   # cat( "\n" )
-  
+
   tmp2 <- tmp@Author[[k]]
   tmp2[is.na(tmp2)] <- ""
   tmp2$LastName <- paste0(tmp2$CollectiveName,tmp2$LastName)
-  
+
   x <- paste0(paste0( tmp2$LastName ," ", tmp2$Initials ,collapse = ", "),".")
   x1 <- paste0(sub(".* ","",i), " ", substring(sub(" .*","",i), 1, 1) )
   if( grepl( paste0(x1,"[,.] "), x ) ){
@@ -369,9 +288,5 @@ for(j in match( all_pubs2$PMID , tmp@PMID ) ){
   cat( "<hr>" )
   cat( "\n\n" )
 
-sink() 
+sink()
 sink(type="message")
-```
-
-
-

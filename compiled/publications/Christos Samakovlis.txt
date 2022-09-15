@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p>Ahmadvand N, Lingampally A, Khosravi F, Vazquez-Armendariz AI, Rivetti S, Jones MR, Wilhelm J, Herold S, Barreto G, Koepke J, <u>Samakovlis C</u>, Carraro G, Zhang JS, Al Alam D, Bellusci S. <b>Fgfr2b signaling is essential for the maintenance of the alveolar epithelial type 2 lineage during lung homeostasis in mice.</b>
 <a href='https://doi.org/10.1007/s00018-022-04327-w'>Cellular and molecular life sciences : CMLS</a> (May 2022) </p>
 
@@ -58,3 +59,5 @@
 <p>Tiklová K, Senti KA, Wang S, Gräslund A, <u>Samakovlis C</u>. <b>Epithelial septate junction assembly relies on melanotransferrin iron binding and endocytosis in Drosophila.</b>
 <a href='https://doi.org/10.1038/ncb2111'>Nature cell biology</a> (Oct 2010) </p>
 
+=======
+>>>>>>> 84d3997c79a9d81d62d30050c548284ac5aa71e9

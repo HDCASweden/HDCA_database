@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p>Luecken MD, Zaragosi LE, Madissoon E, Sikkema L, Firsova AB, De Domenico E, Kümmerle L, Saglam A, Berg M, Gay ACA, Schniering J, Mayr CH, Abalo XM, Larsson L, Sountoulidis A, Teichmann SA, van Eunen K, Koppelman GH, Saeb-Parsy K, Leroy S, Powell P, Sarkans U, Timens W, Lundeberg J, van den Berge M, <u>Nilsson M</u>, Horváth P, Denning J, Papatheodorou I, Schultze JL, Schiller HB, Barbry P, Petoukhov I, Misharin AV, Adcock IM, von Papen M, Theis FJ, Samakovlis C, Meyer KB, Nawijn MC. <b>The discovAIR project: a roadmap towards the Human Lung Cell Atlas.</b>
 <a href='https://doi.org/10.1183/13993003.02057-2021'>The European respiratory journal</a> (Jan 2022) </p>
 
@@ -67,3 +68,5 @@
 <p>Larsson C, Grundberg I, Söderberg O, <u>Nilsson M</u>. <b>In situ detection and genotyping of individual mRNA molecules.</b>
 <a href='https://doi.org/10.1038/nmeth.1448'>Nature methods</a> (Apr 2010) </p>
 
+=======
+>>>>>>> 84d3997c79a9d81d62d30050c548284ac5aa71e9
