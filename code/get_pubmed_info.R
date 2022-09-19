@@ -92,7 +92,7 @@ tmp <- lapply( file_list , function(i){
       JOURNAL = sub("[.] .*","",x[1]),
       YEAR = sub(" .*","",sub(".*[.] ","",sub(";.*","",x[1]))),
       DOI = ifelse(grepl("doi",x[1]),sub("[.] .*","",sub(".*doi: ","",x[1])),"") ,
-      AUTHORS = x[3]
+      AUTHORS = fix_names(x[3])
     )
     return(z)
   })
@@ -105,17 +105,29 @@ tmp <- lapply( file_list , function(i){
   d$IF <- IF[ match(reformat_journal_name(d$FULL_JOURNAL_NAME) , IF$journal_name) , "Journal Impact Factor"]
   return(d)
 })
+names(tmp) <- file_list
 
-# Merge all publications
+
+# Remove bad-formated or less relevant entries
+tmp <- lapply( tmp , function( i ){
+  # Filter publications
+  i <- i[!is.na(as.numeric(i$IF)),]
+  i <- i[as.numeric(i$IF) > 20,]
+  i <- i[!is.na(i$TITLE),]
+  i <- i[!grepl("Author Correction: ",i$TITLE),]
+  i <- i[!is.na(as.numeric(i$YEAR)),]
+  i <- i[as.numeric(i$YEAR) > 2015,]
+  i <- i[order(as.numeric(i$YEAR),decreasing = T),]
+})
+
+
+# Export publications per PI
+lapply( names(tmp) , function( i ){
+  write.csv( tmp[[i]] , gsub(".txt$",".csv",gsub("data","compiled",i)) )
+})
+
+
+
+# Merge all publications and export
 tmp2 <- do.call(rbind,tmp)
-
-# Filter publications
-tmp2 <- tmp2[!is.na(as.numeric(tmp2$IF)),]
-tmp2 <- tmp2[as.numeric(tmp2$IF) > 20,]
-tmp2 <- tmp2[!is.na(tmp2$TITLE),]
-tmp2 <- tmp2[!grepl("Author Correction: ",tmp2$TITLE),]
-tmp2 <- tmp2[!is.na(as.numeric(tmp2$YEAR)),]
-tmp2 <- tmp2[as.numeric(tmp2$YEAR) > 2015,]
-tmp2 <- tmp2[order(as.numeric(tmp2$YEAR),decreasing = T),]
-
 write.csv(tmp2,"../compiled/publications/paper_news.csv")
