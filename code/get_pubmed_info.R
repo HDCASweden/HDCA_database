@@ -17,7 +17,7 @@ reformat_journal_name <- function(journals){
 
 fix_names <-  function(x){
   x <- iconv(x, from = 'UTF-8', to = 'ASCII//TRANSLIT')
-  x <- gsub("[[:punct:]]","",x)
+  # x <- gsub("[[:punct:]]","",x)
   return(x)
 }
 
@@ -77,6 +77,8 @@ tmp <- lapply( file_list , function(i){
   c <- lapply( c , function(x) {
     x <- x[ c(1:3,grep("PMID",x)) ]
     x <- gsub("[(][0-9]+?[)]","",x)
+    x <- gsub("[(]#[)]","*",x)
+    x <- gsub("  "," ",x)
     return(x)
   })
 
@@ -88,10 +90,10 @@ tmp <- lapply( file_list , function(i){
     z <- c(
       DATE = sub(".*[.] ","",sub(";.*","",x[1])),
       PMID = ifelse(grepl("PMID",x[4]),sub(" .*","",sub(".*PMID: ","",x[4])),""),
-      TITLE = x[2],
+      TITLE =  gsub("[.]$","",x[2]),
       JOURNAL = sub("[.] .*","",x[1]),
       YEAR = sub(" .*","",sub(".*[.] ","",sub(";.*","",x[1]))),
-      DOI = ifelse(grepl("doi",x[1]),sub("[.] .*","",sub(".*doi: ","",x[1])),"") ,
+      DOI = gsub("[.]$","",ifelse(grepl("doi",x[1]),sub("[.] .*","",sub(".*doi: ","",x[1])),"")) ,
       AUTHORS = fix_names(x[3])
     )
     return(z)
@@ -118,6 +120,7 @@ tmp <- lapply( tmp , function( i ){
   i <- i[!is.na(as.numeric(i$YEAR)),]
   i <- i[as.numeric(i$YEAR) > 2015,]
   i <- i[order(as.numeric(i$YEAR),decreasing = T),]
+  i <- i[, c("DATE","PMID","YEAR","IF","JOURNAL","TITLE","AUTHORS","DOI","FULL_JOURNAL_NAME")]
 })
 
 
@@ -126,8 +129,17 @@ lapply( names(tmp) , function( i ){
   write.csv( tmp[[i]] , gsub(".txt$",".csv",gsub("data","compiled",i)) )
 })
 
-
-
 # Merge all publications and export
 tmp2 <- do.call(rbind,tmp)
+tmp2 <- tmp2[order(as.numeric(tmp2$YEAR),decreasing = T),]
+rownames(tmp2) <- 1:nrow(tmp2)
 write.csv(tmp2,"../compiled/publications/paper_news.csv")
+
+
+
+tmp2[2,]
+
+
+
+
+#
