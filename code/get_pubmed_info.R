@@ -137,9 +137,4 @@ write.csv(tmp2,"../compiled/publications/paper_news.csv")
 
 
 
-tmp2[2,]
-
-
-
-
 #
