@@ -1,0 +1,449 @@
+
+# Load libraries
+
+```{r}
+library(niceRplots)
+library(future)
+library(future.apply)
+library(Matrix)
+library(sparseMatrixStats)
+library(rhdf5)
+library(biomaRt)
+
+# grep( "length", biomaRt::listAttributes(mart)[,1],value = T)
+# mouse = useMart("ensembl", dataset = paste0("mmusculus_gene_ensembl"),host="jul2019.archive.ensembl.org")
+# mouse_annot <- getBM(c("ensembl_gene_id","ensembl_transcript_id","external_gene_name","gene_biotype",
+#                  "transcript_biotype","chromosome_name","transcript_length"),mart = mart)
+# human = useMart("ensembl", dataset = paste0("hsapiens_gene_ensembl"),host="jul2019.archive.ensembl.org")
+# human_annot <- getBM(c("ensembl_gene_id","ensembl_transcript_id","external_gene_name","gene_biotype",
+#                  "transcript_biotype","chromosome_name","transcript_length"),mart = mart)
+# 
+# mouse_human_annot = getLDS(attributes = c("ensembl_gene_id","external_gene_name"), 
+#                            filters = "ensembl_gene_id", 
+#                            values = mouse_annot$ensembl_gene_id , 
+#                            mart = mouse, 
+#                            attributesL = c("ensembl_gene_id","external_gene_name"), 
+#                            martL = human, 
+#                            uniqueRows=F,
+#                            valuesL = "external_gene_name")
+# write.csv2(mouse_human_annot,"mouse_human_annot.csv")
+mouse_human_annot <- read.csv2("mouse_human_annot.csv",row.names = 1)
+```
+
+```{r}
+GEO_read_metadata <- function( GEO_id = NULL , file_path = NULL, url_path = NULL ){
+  if(!is.null(GEO_id)){
+    url_path <- paste0("https://ftp.ncbi.nlm.nih.gov/geo/series/",
+                            gsub("...$","nnn",GEO_id),"/",GEO_id,"/matrix/",
+                            GEO_id,"_series_matrix.txt.gz")
+    if(!is.null(file_path)) {
+      download.file( url_path , file_path )
+    } else {
+      download.file( url_path , destfile = paste0(GEO_id,"_series_matrix.txt.gz"))
+      file_path <- paste0(GEO_id,"_series_matrix.txt.gz")
+    }
+    ii <- readLines( file_path )
+  } else if(!is.null(file_path)) {
+
+  } else {
+    file_path <- gzcon(url( url_path ))
+  }
+  ii <- readLines( file_path )
+  tmp <- t(read.delim( file_path ,skip = (1:length(ii))[ii==""],header = F))
+  colnames(tmp) <- gsub("[!]","",tmp[1,]) 
+  rownames(tmp) <- tmp[,"Sample_geo_accession"]
+  tmp <- tmp[-1,]
+  return( data.frame(tmp) )
+}
+
+
+GEO_extract_raw_data <- function( path_to_tar ){
+  
+  path <- gsub("[.]tar","",path_to_tar)
+  if(!dir.exists(path)){ dir.create(path) }
+  system(paste0("tar -xvf ",path,".tar -C ",path) )
+  
+  # Move files into separate directories
+  fl <- list.files(path)
+  fl <- unique( gsub("_.*","",fl) )
+  fl <- paste0(path,"/",fl)
+  for(i in fl){  if(!dir.exists( i ) ){ dir.create( i )} }
+  
+  # Move files into separate directories
+  dl <- list.dirs(path)[-1]
+  for(i in dl){ system( paste0("mv ",i,"*.* ",i) ) }
+}
+
+
+rename_10x <- function( dl ){
+  # Extract files
+  for(i in dl){
+    fl2 <- list.files(i)
+    fl3 <- gsub(".*_","",fl2)
+    file.rename(from = paste0(i,"/",fl2),
+                to   = paste0(i,"/",fl3))
+  }
+}
+
+
+GEO_download_files <- function( meta , columns , dir ){
+  future_lapply( fls_use, dir_use=dir, meta=meta, columns=columns, function(i,dir_use,meta,columns){
+    print(i)
+    for(j in as.character( meta[i,columns] ) ) {
+      dir.create(paste0( dir_use,"/",i), recursive = T )
+      download.file( url = paste0(gsub("ftp:","https:",gsub(paste0(i,"_.*"),"",j)),
+                                  gsub("_","%5F",gsub("[.]","%2E",gsub(".*[/]","",j)))) , 
+                     destfile = paste0( dir_use,"/",i,"/",gsub(".*[/]","",j)) )
+    }
+  })
+}
+```
+
+
+#Zhang2021
+
+```{r}
+meta <- GEO_read_metadata("GSE136719")
+meta$Sample_supplementary_file_1
+
+
+
+tmpcols <- c("Sample_supplementary_file_1","Sample_supplementary_file_2","Sample_supplementary_file_3")
+
+plan(multisession, workers=future::availableCores()-1 )
+fls_use <- meta$Sample_geo_accession
+dir_use <- "Zhang2021"
+fls_use <- list.files(dir_use,pattern = "[.]h5",recursive = T)
+fls_use <- meta$Sample_geo_accession [ !( meta$Sample_geo_accession %in% gsub("[/].*","",fls_use)) ]
+
+
+future_lapply( fls_use[-c(1:9)], dir_use=dir_use, meta=meta, function(i,dir_use,meta){
+  print(i)
+  for(j in as.character( meta[i,tmpcols] ) ) {
+    
+    dir.create(paste0( dir_use,"/",i), recursive = T )
+    download.file( url = paste0(gsub("ftp:","https:",gsub(paste0(i,"_.*"),"",j)),
+                                gsub("_","%5F",gsub("[.]","%2E",gsub(".*[/]","",j)))) , 
+                   destfile = paste0( dir_use,"/",i,"/",gsub(".*[/]","",j)) )
+  }
+  flss <- list.files( paste0( dir_use,"/",i) ,full.names = T)
+  try(a <-  as(Matrix::readMM( gzfile(grep("matrix.mtx",flss,value = T),'rt') ),Class = "dgCMatrix"), silent = T )
+  try(tt1 <- read.table(gzfile(grep("features.tsv",flss,value = T),'rt')), silent = T )
+  try(tt2 <- read.table(gzfile(grep("barcodes.tsv",flss,value = T),'rt')), silent = T )
+  dim(tt1) ; dim(tt2) ; dim(a)
+  if( nrow(tt1) > nrow(tt2)){
+    rownames(a) <- as.character(tt1[,2])
+    colnames(a) <- as.character(tt2[,1])
+  } else {
+    rownames(a) <- as.character(tt2[,2])
+    colnames(a) <- as.character(tt1[,1])
+  }
+  colnames(a) <- paste0(dir_use,"","_",i,"_",gsub("[-].*","",colnames(a)) )
+  save_matrix_to_HDF5(a,paste0(dir_use,"/",i,"/",dir_use,"_",gsub(".*[/]","",i),"_counts.h5"))
+})
+
+
+
+
+
+
+
+meta1 <- data.frame(x=colnames(a),
+                      dataset = "Zhang2021",sampleID=i,
+                      age=gsub("_.*","",meta$Sample_title[i]) ,
+                      row.names = colnames(a))
+meta1 <- meta1[,-1]
+meta1$tissue <- gsub(".*[0-9]","",meta1$age)
+meta1$age <- gsub(".$","",meta1$age)
+write.csv2(meta1,paste0("Zhang2021/",i,"/Zhang2021_",gsub(".*[/]","",i),"_metadata.csv"),row.names = T)
+
+
+
+  
+x <- "GSM408037"
+fls <- c( "%5Fmatrix%2Emtx%2Egz", "%5Ffeatures%2Etsv%2Egz", "%5Fbarcodes%2Etsv%2Egz")
+bs <- "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM4080nnn/"
+ff <- paste0( meta$X.Sample_geo_accession , "_" , rownames(meta) )
+ff <- paste0( meta$X.Sample_geo_accession,"/suppl/",gsub("_","%5F",ff) )
+
+GEO_extract_raw_data("Zhang2021/GSE136719_RAW.tar")
+rename_10x(list.dirs("Zhang2021")[-1])
+system(paste0("chmod -R 755 ","Zhang2021/GSE136719_RAW"))
+
+meta <- GEO_read_metadata("Zhang2021/GSE136719_series_matrix.txt")
+
+meta <- data.frame(meta)
+meta$X.Sample_supplementary_file_1
+
+
+```
+
+# Zeisel2018
+
+```{r}
+file_use <- "Zeisel2018/10X43_3.loom"
+Zeisel2018 <- h5ls(file_use)
+
+a <- h5read(file_use,name = "matrix")
+a <- Matrix::t(Matrix(a,sparse = T))
+rownames(a) <- h5read(file_use,name = "row_attrs/Gene")
+colnames(a) <- gsub("[-.]","_",gsub("[-].*","",h5read(file_use,name = "col_attrs/CellID")))
+a <- a[,(1:ncol(a))[!duplicated(colnames(a))] ]
+a <- a[(1:nrow(a))[!duplicated(rownames(a))],]
+dim(a)
+
+hg <- mouse_human_annot[match( rownames(a) , mouse_human_annot[,2]  ),4]
+hg[is.na(hg)] <- ""
+mm <- sparse.model.matrix(~0+hg)
+colnames(mm) <- gsub(".*hg","",colnames(mm))
+aa <- t(mm) %*% a
+aa <- aa[-1,]
+aa@x <- round(aa@x)
+aa <- drop0(aa)
+dim(aa)
+
+
+meta <- h5read(file_use,name = "col_attrs")
+meta <- do.call(cbind,meta)
+meta <- meta[!duplicated(gsub("[-.]","_",gsub("[-].*","",meta[,"CellID"]))),]
+rownames(meta) <-  gsub("[-.]","_",gsub("[-].*","",meta[,"CellID"]))
+meta <- data.frame(meta)
+meta$dataset <- "Zeisel2018"
+meta$sampleID <- gsub("[:].*","",rownames(meta))
+meta <- meta[,-c(1:4)]
+
+aa <- aa[,rownames(meta)]
+
+save_matrix_to_HDF5( aa , file_name = "Zeisel2018/Zeisel2018_10X43w3_counts.h5" )
+write.csv2(meta,"Zeisel2018/Zeisel2018_10X43w3_metadata.csv")
+```
+
+# Sathyamurthy2018
+
+```{r}
+
+```
+
+# Rosenberg2018
+
+```{r}
+
+```
+
+# Rayon2021
+
+```{r}
+GEO_extract_raw_data("Rayon2021/GSE171892_RAW.tar")
+dl <- list.dirs("Rayon2021/GSE171892_RAW")[-1]
+for(i in dl){ system( paste0("gunzip ",list.files(i,full.names = T)) ) }
+for(i in dl){ system(paste0("tar -xvf ",list.files(i,full.names = T)," -C ",i) ) }
+for(i in dl){ system(paste0("rm -fr ",list.files(i,full.names = T,pattern = ".tar")) ) }
+system(paste0("chmod -R 755 ","Rayon2021/GSE171892_RAW"))
+for(i in dl){ system(paste0("mv $(ls ",list.files(i,full.names = T),"/*) ",i,"/") ) }
+for(i in dl){ system( paste0("rm -rf ",list.dirs(i,full.names = T)[-1]) ) }
+
+meta <- GEO_read_metadata(file_path = "Rayon2021/GSE171892-GPL20301_series_matrix.txt")
+meta <- rbind(meta,GEO_read_metadata("Rayon2021/GSE171892-GPL21103_series_matrix.txt"))
+meta <-  data.frame(meta)
+
+plan(multisession, workers=future::availableCores()-1 )
+dl <- list.dirs("Rayon2021/GSE171892_RAW")[-1]
+future_lapply( dl , function(x){ 
+  zz <- gzfile(paste0(x,"/matrix.mtx.gz"),'rt')
+  a <- as(Matrix::readMM(zz),Class = "dgCMatrix")
+  
+  zz <- gzfile(paste0(x,"/barcodes.tsv.gz"),'rt')
+  colnames(a) <- as.character(read.table(zz)[,1])
+  colnames(a) <- paste0(x,"/Rayon2021_",gsub("[-].*","",colnames(a)),"_counts.h5")
+  
+  zz <- gzfile(paste0(x,"/features.tsv.gz"),'rt')
+  rownames(a) <- as.character(read.table(zz)[,2])
+  
+  meta <- data.frame(aa = colnames(a),
+                     dataset="Rayon2021",
+                     sampleID= gsub(".*[/]","",x),
+                     species= meta$Sample_organism_ch1 [ meta$Sample_geo_accession == gsub(".*[/]","",x)  ],
+                     age=gsub(".*[ ]","",meta$Sample_characteristics_ch1) [ meta$Sample_geo_accession == gsub(".*[/]","",x)  ],
+                     region=gsub("tissue:[ ]","", meta$Sample_characteristics_ch1.1) [ meta$Sample_geo_accession == gsub(".*[/]","",x)  ],
+                     row.names = colnames(a))
+  
+  save_matrix_to_HDF5(a,paste0(x,"/Rayon2021_",gsub(".*[/]","",x),"_counts.h5"))
+  write.csv2(meta[,-1],paste0(x,"/Rayon2021_",gsub(".*[/]","",x),"_metadata.csv"),row.names = T)
+})
+
+
+for(i in dl){ system( paste0("rm -rf ",i,"/*.gz") ) }
+mmm <- setNames( meta$X.Sample_organism_ch1 , meta$X.Sample_geo_accession )
+for( i in names(mmm[mmm == "Mus musculus"]) ){
+  a <- read_h5(paste0("Rayon2021/GSE171892_RAW/",i,"/Rayon2021_",i,"_counts.h5") )
+  hg <- mouse_human_annot[match( rownames(a) , mouse_human_annot[,2]  ),4]
+  hg[is.na(hg)] <- ""
+  
+  mm <- sparse.model.matrix(~0+hg)
+  colnames(mm) <- gsub(".*hg","",colnames(mm))
+  aa <- t(mm) %*% a
+  aa <- aa[-1,]
+  aa@x <- round(aa@x)
+  aa <- drop0(aa)
+  dim(aa)
+  
+  save_matrix_to_HDF5(a,paste0(x,"/Rayon2021_",gsub(".*[/]","",x),"_counts.h5"))
+}
+```
+
+
+# Milich2021
+
+```{r}
+meta <- GEO_read_metadata("GSE162610")
+meta
+
+a <- as(Matrix::readMM("Milich2021_GSE162610/GSE162610_sci_mat.mtx"),Class = "dgCMatrix")
+tt1 <- read.table("Milich2021_GSE162610/GSE162610_gene_metadata.tsv")
+rownames(a) <- tt1$ensembl_gene_id
+
+hg <- mouse_human_annot[match( rownames(a) , mouse_human_annot[,1]  ),4]
+hg[is.na(hg)] <- ""
+
+mm <- sparse.model.matrix(~0+hg)
+colnames(mm) <- gsub(".*hg","",colnames(mm))
+aa <- t(mm) %*% a
+aa <- aa[-1,]
+aa@x <- round(aa@x)
+aa <- drop0(aa)
+dim(aa)
+
+tt2 <- read.table("Milich2021_GSE162610/GSE162610_barcodes.tsv")[,1]
+tt2 <- paste0( "Milich2021_",meta[match( sub(".*[ATCG]_","",tt2) , meta$Sample_title),"Sample_geo_accession"],"_",
+               gsub("_.*","",tt2))
+colnames(aa) <- tt2
+
+for(i in unique( gsub("_.*","",gsub("Milich2021_","",colnames(aa))) )){
+  a <- aa[,grep(i,colnames(aa))]
+  dir.create(paste0(""),recursive = T)
+  save_matrix_to_HDF5(a,paste0("Milich2021_GSE162610/Milich2021_",i,"_counts.h5"))
+}
+
+tt3 <- read.table("Milich2021_GSE162610/GSE162610_barcode_metadata.tsv")
+rownames(tt3) <- paste0("Milich2021_",meta[match( tt3$orig.ident,meta$Sample_title ),"Sample_geo_accession"],"_",gsub("_.*","",rownames(tt3)))
+
+for(i in unique( gsub("_.*","",gsub("Milich2021_","",colnames(aa))) )){
+  write.csv2( tt3[grep(i,rownames(tt3)),] , paste0("Milich2021_GSE162610/Milich2021_",i,"_metadata.csv"))
+}
+
+table(tt3$orig.ident,tt3$sample_id)
+
+meta$Sample_title
+meta$Sample_geo_accession
+```
+
+# Hayashi2018
+
+```{r}
+
+```
+
+# Haring2018
+
+```{r}
+
+```
+
+# Delile2019
+
+```{r}
+a <- readMM("Delile2019/E-MTAB-7320.aggregated_filtered_counts.mtx")
+a <- as( a , Class = "dgCMatrix" )
+dim(a)
+colnames(a) <- read.delim("Delile2019/E-MTAB-7320.aggregated_filtered_counts.mtx_cols",header = F)[,1]
+rownames(a) <- read.delim("Delile2019/E-MTAB-7320.aggregated_filtered_counts.mtx_rows",header = F)[,2]
+colnames(a) <- gsub("[-]","_",colnames(a))
+dim(a)
+meta <- read.delim("Delile2019/E-MTAB-7320.clusters.tsv")
+rownames(meta) <- paste0( "cluster_k_", meta[,2] )
+meta <- t(meta)[-c(1:2),]
+rownames(meta) <- gsub( "[.]","_",rownames(meta) )
+dim(meta)
+meta <- meta[ colnames(a) ,]
+table(gsub( "[-].*","", colnames(a) ))
+meta <- cbind(dataset="Delile2019",sampleID=gsub( "[_].*","", colnames(a) ),meta)
+meta <- data.frame(meta)
+meta$sampleID <- gsub("[_].*","",meta$sampleID)
+
+hg <- mouse_human_annot[match( rownames(a) , mouse_human_annot[,1]  ),4]
+hg[is.na(hg)] <- ""
+
+mm <- sparse.model.matrix(~0+hg)
+colnames(mm) <- gsub(".*hg","",colnames(mm))
+aa <- t(mm) %*% a
+aa <- aa[-1,]
+aa@x <- round(aa@x)
+aa <- drop0(aa)
+dim(aa)
+
+save_matrix_to_HDF5(a,"Delile2019/Delile2019_counts.h5")
+for(i in unique(meta$sampleID)){
+  save_matrix_to_HDF5( aa[ , meta$sampleID == i ] , paste0("Delile2019/Delile2019_",i,"_counts.h5"))}
+for(i in unique(meta$sampleID)){
+  write.csv(meta[ meta$sampleID == i, ],paste0("Delile2019/Delile2019_",i,"_metadata.csv"),row.names = T) }
+
+
+```
+
+# Baek2019
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
+
+```{r}
+# 
+# 
+# rename_10x(list.dirs("Zhang2021")[-1])
+# 
+# plan(multisession, workers=future::availableCores()-1 )
+# dl <- list.dirs("Zhang2021")[-1]
+# future_lapply( dl , function(x){ 
+#   a <- NULL ; tt1 <- NULL ; tt2 <- NULL
+#   
+#   a <- try( as(Matrix::readMM( gzfile(paste0(x,"/matrix.mtx.gz"),'rt') ),Class = "dgCMatrix") )
+#   if(file.exists(paste0(x,"/matrix.mtx.gz"))){
+#   a <- try( as(Matrix::readMM( paste0(x,"/matrix.mtx") ),Class = "dgCMatrix") ) }
+#   
+#   if(!is.null(a)){
+#     tt1 <- try( read.table(gzfile(paste0(x,"/barcodes.tsv.gz"),'rt')) )
+#     tt2 <- try( read.table(gzfile(paste0(x,"/features.tsv.gz"),'rt')) )
+#   
+#     if( nrow(tt1) > nrow(tt2)){
+#       rownames(a) <- as.character(tt1[,2])
+#       colnames(a) <- as.character(tt2[,1])
+#     } else {
+#       rownames(a) <- as.character(tt2[,1])
+#       colnames(a) <- as.character(tt1[,2])
+#     }
+#     save_matrix_to_HDF5(a,paste0(x,"/",gsub(".*[/]","",x),".h5"))
+#   } else { print(paste0(x," FAILED")) }
+# })
+# 
+# meta <- read_GEO_metadata("Zhang2021/GSE136719_series_matrix.txt")
+
+# lf <- list.files(path = "Zhang2021/GSE136719_RAW", full.names = T,pattern = "[.]gz",recursive = T)
+# file.remove(lf)
+```
+
