@@ -1,7 +1,13 @@
 #!/bin/bash
+source /home/ubuntu/HDD/opt/miniforge3/etc/profile.d/conda.sh
+source ~/.bash_profile
+wait
+conda activate dotfiles
 
-mkdir -p ../data/publications
-mkdir -p ../compiled/publications
+cd ~/repos/HDCA_database/code
+
+mkdir -p data/publications
+mkdir -p compiled/publications
 
 echo 'Joakim Lundeberg'
 # esearch -db pubmed -query 'Joakim Lundeberg' | efetch -format native -mode xml > ../data/publications/JL.xml
