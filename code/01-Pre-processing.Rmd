@@ -1,0 +1,1089 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+# Load libraries
+
+```{r}
+library(niceRplots)
+library(future)
+library(future.apply)
+library(Matrix)
+library(sparseMatrixStats)
+library(rhdf5)
+library(biomaRt)
+# install.packages("R.matlab")
+library(R.matlab)
+```
+
+
+```{r}
+file_list <- list.files("../CLEAN_DATA", pattern = ".h5",recursive = T,full.names = T)
+file.rename(file_list,file_list)
+file_list <- file_list [ stringr::str_count(file_list,"/")==4 ]
+file.remove(file_list)
+
+# grep( "length", biomaRt::listAttributes(mart)[,1],value = T)
+mouse = useMart("ensembl", dataset = paste0("mmusculus_gene_ensembl"))
+mouse_annot <- getBM(c("ensembl_gene_id","ensembl_transcript_id","external_gene_name","gene_biotype","transcript_biotype","chromosome_name","transcript_length"),mart = mouse)
+human = useMart("ensembl", dataset = paste0("hsapiens_gene_ensembl"),host="jul2019.archive.ensembl.org")
+human_annot <- getBM(c("ensembl_gene_id","ensembl_transcript_id","external_gene_name","gene_biotype",
+                 "transcript_biotype","chromosome_name","transcript_length"),mart = human)
+# 
+# mouse_human_annot = getLDS(attributes = c("ensembl_gene_id","external_gene_name"),
+#                            filters = "ensembl_gene_id",
+#                            values = mouse_annot$ensembl_gene_id ,
+#                            mart = mouse,
+#                            attributesL = c("ensembl_gene_id","external_gene_name"),
+#                            martL = human,
+#                            uniqueRows=F,
+#                            valuesL = "external_gene_name")
+# write.csv2(mouse_human_annot,"mouse_human_annot.csv")
+mouse_human_annot <- read.csv2("../mouse_human_annot.csv",row.names = 1)
+
+# setwd("GEO_DATA")
+```
+
+```{r}
+GEO_read_soft <- function( GEO_id = NULL , file_path = NULL, url_path = NULL ){
+  if(!is.null(GEO_id)){
+    url_path <- paste0("https://ftp.ncbi.nlm.nih.gov/geo/series/",
+                            gsub("...$","nnn",GEO_id),"/",GEO_id,"/soft/",
+                            GEO_id,"_family.soft.gz")
+    if(!is.null(file_path)) {
+      download.file( url_path , file_path, quiet = T )
+    } else {
+      download.file( url_path , destfile = paste0(GEO_id,"_family.soft.gz"), quiet = T)
+      file_path <- paste0(GEO_id,"_family.soft.gz")
+    }
+    ii <- readLines( file_path )
+  }
+  return( ii )
+}
+
+GEO_read_metadata <- function( GEO_id = NULL , file_path = NULL, url_path = NULL ){
+  
+  a <- GEO_read_soft(GEO_id)
+  tmp <- unique( gsub(".*SuperSeries of: ","",a[grep('SuperSeries of:',a)]) )
+  
+  if(length(tmp) > 0){
+    GEO_ids <- tmp
+    message(paste0("This GEO accession is a SuperSeries contating the following datasets: ",paste0(GEO_ids,collapse = ", ") ))
+  } else {
+    GEO_ids <- GEO_id
+  }
+  
+  res <- lapply(
+    X = GEO_ids ,
+    file_path = file_path, 
+    url_path = url_path, 
+    FUN = function(GEO_id,file_path,url_path){
+      if(!is.null(GEO_id)){
+        url_path <- paste0("https://ftp.ncbi.nlm.nih.gov/geo/series/",
+                              gsub("...$","nnn",GEO_id),"/",GEO_id,"/matrix/",
+                              GEO_id,"_series_matrix.txt.gz")
+        if(!is.null(file_path)) {
+          download.file( url_path , file_path , quiet = T)
+        } else {
+          download.file( url_path , destfile = paste0(GEO_id,"_series_matrix.txt.gz"), quiet = T)
+          file_path <- paste0(GEO_id,"_series_matrix.txt.gz")
+        }
+          ii <- readLines( file_path )
+      } else if(!is.null(file_path)) {
+    
+      } else {
+        file_path <- gzcon(url( url_path ))
+      }
+      ii <- readLines( file_path )
+      tmp <- t(read.delim( file_path ,skip = (1:length(ii))[ii==""],header = F))
+      colnames(tmp) <- gsub("[!]","",tmp[1,]) 
+      rownames(tmp) <- tmp[,"Sample_geo_accession"]
+      tmp <- tmp[-1,]
+      return( data.frame(tmp) )
+  })
+  names(res) <- GEO_ids
+  return(res)
+}
+
+
+GEO_extract_raw_data <- function( path_to_tar ){
+  
+  path <- gsub("[.]tar","",path_to_tar)
+  if(!dir.exists(path)){ dir.create(path) }
+  system(paste0("tar -xvf ",path,".tar -C ",path) )
+  
+  # Move files into separate directories
+  fl <- list.files(path)
+  fl <- unique( gsub("_.*","",fl) )
+  fl <- paste0(path,"/",fl)
+  for(i in fl){  if(!dir.exists( i ) ){ dir.create( i )} }
+  
+  # Move files into separate directories
+  dl <- list.dirs(path)[-1]
+  for(i in dl){ system( paste0("mv ",i,"*.* ",i) ) }
+}
+
+
+rename_10x <- function( dl ){
+  # Extract files
+  for(i in dl){
+    fl2 <- list.files(i)
+    fl3 <- gsub(".*_","",fl2)
+    file.rename(from = paste0(i,"/",fl2),
+                to   = paste0(i,"/",fl3))
+  }
+}
+
+
+GEO_download_files <- function( meta , columns , dir ){
+  future_lapply( rownames(meta), dir_use=dir, meta=meta, columns=columns, function(i,dir_use,meta,columns){
+    print(i)
+    for(j in c(as.character( meta[i,columns] )) ) {
+      dir.create(paste0( dir_use,"/",i), recursive = T )
+      download.file( url = paste0(gsub("ftp:","https:",gsub(paste0(i,"_.*"),"",j)),
+                                  gsub("_","%5F",gsub("[.]","%2E",gsub(".*[/]","",j)))) , 
+                     destfile = paste0( dir_use,"/",i,"/",gsub(".*[/]","",j)) )
+    }
+  })
+}
+```
+
+
+#Li2022
+
+```{r}
+PATH_DATA <- "~/Downloads/spinal_cord/CLEAN_DATA/Li2022/"
+
+file_list <- list.files(PATH_DATA, pattern = ".loom")
+h5ls("~/Downloads/spinal_cord/CLEAN_DATA/Li2022/10X162_1.loom")
+
+metadata <- read.delim("~/Desktop/HDCA/samples/Result 1_210211_121011.tab")
+metadata <- metadata[ grep("Spinal cord",metadata$tissue ), ]
+metadata$name <- gsub("_","w",metadata$name)
+
+meta <- data.frame( row.names = list.files("~/Downloads/spinal_cord/CLEAN_DATA/Li2022",pattern = ".h5",full.names = F) )
+rownames(meta) <- gsub("Li2022_","",gsub("_counts.h5","",rownames(meta)))
+meta$sample_id <- rownames(meta)
+meta$sample_name <- meta$sample_id
+meta$dataset <- "Li2022"
+meta$database <- ""
+meta$acession_number <- ""
+meta$age <- paste0("PCW",metadata$age[match(meta$sample_id,metadata$name)])
+meta$age[meta$age == "PCW0"]   <- "PCW5"
+meta$organism <- "Homo sapiens"
+# meta$gender <- metadata$Sample_organism_ch1
+meta$organism_strain <- ""
+meta$organism_genotype <- ""
+meta$disease <- "normal"
+meta$disease_detail <- "normal"
+meta$exp_condition_1 <- ""
+meta$exp_condition_2 <- ""
+meta$exp_condition_3 <- ""
+meta$tissue <- "spinal cord"
+meta$tissue_region <- gsub("Spinal cord ","",metadata$tissue[match(meta$sample_id,metadata$name)])
+meta$tissue_region[meta$tissue_region == "Spinal cord"] <- "whole"
+meta$tissue_detail <- ""
+meta$technology <- "scRNAseq"
+meta$library_technology <- paste0("10X",metadata$chemistry[match(meta$sample_id,metadata$name)])
+meta$molecule <- "mRNA"
+write.csv(meta,"../CLEAN_DATA/Li2022/Li2022_metadata.csv",row.names = T)
+
+
+plan(multiprocess, workers=future::availableCores()-1  )
+assay <- "RNA"
+future_lapply( 
+  file_list , function(x) { 
+  
+  #Read raw counts from loom file 
+  a <- Matrix::t(Matrix::Matrix(rhdf5::h5read(paste0(PATH_DATA,x),name = "matrix"),sparse = T))
+  colnames(a) <-  rhdf5::h5read(paste0(PATH_DATA,x),name = "col_attrs/CellID")
+  rownames(a) <-  rhdf5::h5read(paste0(PATH_DATA,x),name = "row_attrs/Gene")
+  
+  meta <- h5read(paste0(PATH_DATA,x),name = "col_attrs")
+  meta <- t(do.call(rbind,meta))
+  meta <- meta[!duplicated(gsub("[-.]","_",gsub("[-].*","",meta[,"CellID"]))),]
+  rownames(meta) <-  gsub("[-.]","_",gsub("[-].*","",meta[,"CellID"]))
+  meta <- data.frame(meta)
+  meta$dataset <- "Li2022"
+  meta$sampleID <- gsub("[_]","w",gsub("[_]AB.*","",rownames(meta)))
+  # meta <- meta[,-c(1:4)]
+  rownames(meta) <- paste0("Li2022_",gsub("[.]loom","",gsub("[_]","w",x)),"_",gsub("x$","",gsub(".*[:]","",rownames(meta)))  )
+  
+  colnames(a) <- paste0("Li2022_",gsub("[.]loom","",gsub("[_]","w",x)),"_",gsub("x$","",gsub(".*[:]","",colnames(a)))  )
+  a <- a[,rownames(meta)]
+  
+  dir.create(paste0("~/Downloads/spinal_cord/CLEAN_DATA/Li2022/",gsub("[.]loom","",gsub("[_]","w",x))))
+  
+  save_matrix_to_HDF5(a,paste0("~/Downloads/spinal_cord/CLEAN_DATA/Li2022/",gsub("[.]loom","",gsub("[_]","w",x)),"/Li2022_",gsub("[.]loom","",gsub("[_]","w",x)),"_counts.h5"))
+  write.csv2(meta,paste0("~/Downloads/spinal_cord/CLEAN_DATA/Li2022/",gsub("[.]loom","",gsub("[_]","w",x)),"/Li2022_",gsub("[.]loom","",gsub("[_]","w",x)),"_metadata.csv"),row.names = T)
+})
+```
+
+
+
+
+
+Cao2020Science 
+10.1126/science.aba7721
+GSE156793
+
+```{r}
+metadata <- GEO_read_metadata("GSE156793")[[1]]
+metadata$Sample_extract_protocol_ch1
+
+meta <- data.frame( row.names = metadata$Sample_geo_accession )
+meta$sample_id <- metadata$Sample_geo_accession
+meta$sample_name <- metadata$Sample_description.1
+meta$dataset <- "Cao2020Science"
+meta$database <- "GEO"
+meta$acession_number <- "GSE156793"
+meta$age <- "8w"
+meta$organism <- metadata$Sample_organism_ch1
+# meta$sex <- ifelse( grepl("Female", metadata$Sample_characteristics_ch1.2),"female","male" )
+meta$organism_strain <- "C57BL/6"
+meta$organism_genotype <- "Chat-iCre: +/wt; SUN1-SfGFP: +/wt"
+meta$disease <- "normal"
+meta$disease_detail <- "normal"
+meta$exp_condition_1 <- ""
+meta$exp_condition_2 <- ""
+meta$exp_condition_3 <- ""
+meta$tissue <- "spinal cord"
+meta$tissue_region <- gsub( "_.*", "",  metadata$Sample_description.1 )
+meta$tissue_detail <- ""
+meta$technology <- "snRNAseq"
+meta$library_technology <- "10Xv3"
+meta$molecule <- "mRNA"
+write.csv(meta,"../CLEAN_DATA/Alkaslasi2021/Alkaslasi2021_metadata.csv",row.names = T)
+
+
+
+```
+
+
+
+```{r}
+a <- readRDS('~/Downloads/Thymus_gene_count.RDS')
+m <- readRDS('~/Downloads/df_cell.RDS')
+for(i in unique(m$Organ)){
+  message(i)
+  saveRDS( 
+    object = m[ grep(i,m$Organ) ,] , 
+    file = paste0('~/Downloads/',i,'_metadata.RDS') )
+}
+
+mt <- readRDS('~/Downloads/Thymus_metadata.RDS')
+dim(mt)
+```
+
+
+
+
+
+#Alkaslasi2021
+
+```{r}
+metadata <- GEO_read_metadata("GSE167597")
+
+meta <- data.frame( row.names = metadata$Sample_geo_accession )
+meta$sample_id <- metadata$Sample_geo_accession
+meta$sample_name <- metadata$Sample_description.1
+meta$dataset <- "Alkaslasi2021"
+meta$database <- "GEO"
+meta$acession_number <- "GSE167597"
+meta$age <- "8w"
+meta$organism <- metadata$Sample_organism_ch1
+# meta$sex <- ifelse( grepl("Female", metadata$Sample_characteristics_ch1.2),"female","male" )
+meta$organism_strain <- "C57BL/6"
+meta$organism_genotype <- "Chat-iCre: +/wt; SUN1-SfGFP: +/wt"
+meta$disease <- "normal"
+meta$disease_detail <- "normal"
+meta$exp_condition_1 <- ""
+meta$exp_condition_2 <- ""
+meta$exp_condition_3 <- ""
+meta$tissue <- "spinal cord"
+meta$tissue_region <- gsub( "_.*", "",  metadata$Sample_description.1 )
+meta$tissue_detail <- ""
+meta$technology <- "snRNAseq"
+meta$library_technology <- "10Xv3"
+meta$molecule <- "mRNA"
+write.csv(meta,"../CLEAN_DATA/Alkaslasi2021/Alkaslasi2021_metadata.csv",row.names = T)
+
+
+
+download.file("https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE167597&format=file&file=GSE167597%5FallMN%5Fcountsmatrix%2Ecsv%2Egz",
+              "../GEO_DATA/Alkaslasi2021/count_matrix.csv.gz")
+b <- read.csv("../GEO_DATA/Alkaslasi2021/count_matrix.csv.gz")
+a <- Matrix(as.matrix(b),sparse = T)
+
+colnames(a) <- paste0(
+  "Alkaslasi2021_",
+  meta$sample_id[match(gsub(".*[.]","",colnames(a)),meta$sample_name)],"_",
+  gsub("[.].*","",colnames(a)))
+
+
+hg <- mouse_human_annot[match( rownames(a) , mouse_human_annot[,2]  ),4]
+hg[is.na(hg)] <- ""
+mm <- sparse.model.matrix(~0+hg)
+colnames(mm) <- gsub(".*hg","",colnames(mm))
+a <- t(mm) %*% a
+a <- a[-1,]
+a@x <- round(a@x)
+a <- drop0(a)
+dim(a)
+
+
+chromossome <- mouse_annot[ match(rownames(b), mouse_annot$external_gene_name), "chromosome_name"]
+table(chromossome)
+perc_Y <- colSums(b[(chromossome == "Y") & (!is.na(chromossome)),]) / colSums(b)*100
+perc_X <- colSums(b[(chromossome == "X") & (!is.na(chromossome)),]) / colSums(b)*100
+perc_Yf <- colSums(b[(chromossome == "Y") & (!is.na(chromossome)),]>0) / colSums(b>0)*100
+perc_Xf <- colSums(b[(chromossome == "X") & (!is.na(chromossome)),]>0) / colSums(b>0)*100
+
+rafalib::mypar()
+plot(as.numeric(factor( gsub("_.*","",gsub("Alkaslasi2021_","",colnames(a))) )),perc_Y,cex=.2,
+     col= as.numeric(factor( gsub("_.*","",gsub("Alkaslasi2021_","",colnames(a))) )))
+plot(perc_X,perc_Y,cex=.2,
+     col= as.numeric(factor( gsub("_.*","",gsub("Alkaslasi2021_","",colnames(a))) )))
+
+plot(perc_Xf,perc_Yf,cex=.2,
+     col= as.numeric(factor(gsub("_cell.*","",colnames(a)))))
+
+
+
+for(i in unique(gsub("_.*","",gsub("Alkaslasi2021_","",colnames(a)))) ){
+  save_matrix_to_HDF5( a[ , grep(i,colnames(a)) ] , 
+    paste0("../CLEAN_DATA/Alkaslasi2021/Alkaslasi2021_",i,"_counts.h5"))}
+
+```
+
+
+
+
+#Blum2021
+
+```{r}
+tmp <- readRDS("~/Downloads/all.exps.integrated.RDS")
+# dim(tmp)
+# 
+table(tmp$seurat_clusters)
+write.csv(tmp@meta.data,"../CLEAN_DATA/Blum2021/metadata_with_labels.csv",row.names = T)
+
+
+GEO_extract_raw_data("Blum2021/GSE161621_RAW.tar")
+dl <- list.dirs("Blum2021/GSE161621_RAW")[-1]
+meta <- GEO_read_metadata(file_path = "../GEO_DATA/Blum2021/GSE161621-GPL21626_series_matrix.txt")
+dim(meta)
+meta2 <- GEO_read_metadata(file_path = "../GEO_DATA/Blum2021/GSE161621-GPL24247_series_matrix.txt")
+rownames(meta2) <- colnames(meta)
+metadata <- rbind(meta, GSM4911294=t(meta2) ) 
+
+meta <- data.frame( row.names = metadata$Sample_geo_accession )
+meta$sample_id <- metadata$Sample_geo_accession
+meta$sample_name <- metadata$Sample_title
+meta$dataset <- "Blum2021"
+meta$database <- "GEO"
+meta$acession_number <- "GSE161621"
+meta$age <- "8w"
+meta$organism <- metadata$Sample_organism_ch1
+# meta$gender <- metadata$Sample_organism_ch1
+meta$organism_strain <- "C57BL/6"
+meta$organism_genotype <- "ChAT-IRES-Cre x ROSAnT-nG"
+meta$disease <- "normal"
+meta$disease_detail <- "normal"
+meta$exp_condition_1 <- ""
+meta$exp_condition_2 <- ""
+meta$exp_condition_3 <- ""
+meta$tissue <- "spinal cord"
+meta$tissue_region <- "whole"
+meta$tissue_detail <- ""
+meta$technology <- "snRNAseq"
+meta$library_technology <- "10Xv3"
+meta$molecule <- "mRNA"
+write.csv(meta,"../CLEAN_DATA/Blum2021/Blum2021_metadata.csv",row.names = T)
+
+
+dl <- list.dirs("Blum2021/GSE161621_RAW")[-1]
+for(i in dl){
+  a <- Read10X_h5( list.files(paste0(i),full.names = T,pattern = "[.]h5") )
+  a <- a[,diff(a@p) > 200]
+  dim(a)
+  
+  hg <- mouse_human_annot[match( rownames(a) , mouse_human_annot[,2]  ),4]
+  hg[is.na(hg)] <- ""
+  mm <- sparse.model.matrix(~0+hg)
+  colnames(mm) <- gsub(".*hg","",colnames(mm))
+  a <- t(mm) %*% a
+  a <- a[-1,]
+  a@x <- round(a@x)
+  a <- drop0(a)
+  colnames(a) <- paste0("Blum2021_",gsub(".*[/]","",i),"_",gsub("[-].*","", colnames(a)))
+  
+  meta1 <- data.frame(dataset = gsub("[_].*","",colnames(a)), 
+                      sampleID = gsub(".*[/]","",i), 
+                      species="Mus musculus", 
+                      sample_name=meta[ gsub(".*[/]","",i),"Sample_title"],row.names = colnames(a))
+  
+  
+  save_matrix_to_HDF5( a, paste0(i,"/Blum2021_",gsub(".*[/]","",i),"_counts.h5"))
+  write.csv(meta1, paste0(i,"/Blum2021_",gsub(".*[/]","",i),"_metadata.csv"),row.names = T)
+}
+
+
+
+```
+
+
+#Zhang2021
+
+```{r}
+meta <- GEO_read_metadata("GSE136719")
+
+metadata <- GEO_read_metadata("GSE136719")
+meta <- data.frame( row.names = metadata$Sample_geo_accession )
+meta$sample_id <- metadata$Sample_geo_accession
+meta$sample_name <- metadata$Sample_title
+meta$dataset <- "Zhang2021"
+meta$database <- "GEO"
+meta$acession_number <- "GSE136719"
+meta$age <- paste0( "GW" , gsub( " weeks after gestation" , "" ,   gsub( ".*: " , "" ,  metadata$Sample_characteristics_ch1.1 )))
+meta$organism <- metadata$Sample_organism_ch1
+# meta$sex <- ifelse( grepl("Female", metadata$Sample_characteristics_ch1.2),"female","male" )
+meta$organism_strain <- ""
+meta$organism_genotype <- ""
+meta$disease <- "normal"
+meta$disease_detail <- "normal"
+meta$exp_condition_1 <- ""
+meta$exp_condition_2 <- ""
+meta$exp_condition_3 <- ""
+meta$tissue <- "spinal cord"
+meta$tissue_region <- gsub( ".*: ", "",  metadata$Sample_characteristics_ch1.4 )
+meta$tissue_region[meta$tissue_region=="Whole spinal cord"] <- "whole"
+meta$tissue_region <- casefold(meta$tissue_region)
+meta$tissue_detail <- ""
+meta$technology <- ifelse( grepl("Nuclear", metadata$Sample_characteristics_ch1.3),"snRNAseq","scRNAseq" )
+meta$library_technology <- "10Xv3"
+meta$molecule <- "mRNA"
+write.csv(meta,"../CLEAN_DATA/Zhang2021/Zhang2021_metadata.csv",row.names = T)
+
+
+
+metadata$Sample_characteristics_ch1.3
+
+
+meta$Sample_supplementary_file_1
+
+GEO_download_files( meta , c("Sample_supplementary_file_1","Sample_supplementary_file_2","Sample_supplementary_file_3") , "Zhang2021" )
+
+
+
+
+# 
+# GEO_extract_raw_data("Zhang2021/GSE136719_RAW.tar")
+# rename_10x(list.dirs("Zhang2021")[-1])
+# system(paste0("chmod -R 755 ","Zhang2021/GSE136719_RAW"))
+# 
+# dl <- list.dirs("Zhang2021/GSE136719_RAW")[-1]
+# dl2 <- list.files("Zhang2021/GSE136719_RAW",pattern = "[.]h5",recursive = T,full.names = T)
+# dl <- dl[ ! dl %in% gsub("/Zhang2021_GS.*","",dl2)]
+
+dl <- list.dirs("Zhang2021")[-1]
+
+future_lapply( dl, meta=meta, function(i,meta){
+  print(i)
+  a <- NULL; tt1 <- NULL; tt2 <- NULL
+  flss <- list.files( paste0( i) ,full.names = T)
+  try(a <-  as(Matrix::readMM( gzfile(grep("matrix.mtx",flss,value = T),'rt') ),Class = "dgCMatrix"), silent = T )
+  try(tt1 <- read.table(gzfile(grep("features.tsv",flss,value = T),'rt')), silent = T )
+  try(tt2 <- read.table(gzfile(grep("barcodes.tsv",flss,value = T),'rt')), silent = T )
+  if( (!is.null(a)) & (!is.null(tt1)) & (!is.null(tt2)) ){
+    if( nrow(tt1) > nrow(tt2)){
+      rownames(a) <- as.character(tt1[,2])
+      colnames(a) <- as.character(tt2[,1])
+    } else {
+      rownames(a) <- as.character(tt2[,2])
+      colnames(a) <- as.character(tt1[,1])
+    }
+    
+    colnames(a) <- paste0( "Zhang2021_",gsub(".*[/]","",i),"_",gsub("[-].*","",colnames(a)) )
+    save_matrix_to_HDF5(a,paste0(i,"/Zhang2021_",gsub(".*[/]","",i),"_counts.h5"))
+    
+    meta1 <- data.frame(dataset = gsub("[_].*","",colnames(a)),
+                        sampleID=gsub(".*[/]","",i),
+                        species="Homo sapiens",
+                        age=gsub("_.*","",meta[gsub(".*[/]","",i),"Sample_title"]) ,
+                        row.names = colnames(a))
+    meta1$tissue <- gsub(".*[0-9]","",meta1$age)
+    meta1$age <- gsub(".$","",meta1$age)
+    write.csv2(meta1,paste0(i,"/Zhang2021_",gsub(".*[/]","",i),"_metadata.csv"),row.names = T)
+    
+    } else {
+      print(paste0(i," is corrupted"))
+    }
+})
+
+dl2 <- list.files("Zhang2021",pattern = "[.]gz",recursive = T,full.names = T)
+file.remove(dl2)
+```
+
+# Zeisel2018
+
+```{r}
+file_use <- "../GEO_DATA/Zeisel2018/10X43_3.loom"
+Zeisel2018 <- h5ls(file_use)
+
+a <- h5read(file_use,name = "matrix")
+a <- Matrix::t(Matrix(a,sparse = T))
+rownames(a) <- h5read(file_use,name = "row_attrs/Gene")
+colnames(a) <- paste0( "Zeisel2018_", gsub("[:]","_",gsub("[_]","w",gsub("[-].*","",h5read(file_use,name = "col_attrs/CellID")))))
+a <- a[,(1:ncol(a))[!duplicated(colnames(a))] ]
+a <- a[(1:nrow(a))[!duplicated(rownames(a))],]
+dim(a)
+
+hg <- mouse_human_annot[match( rownames(a) , mouse_human_annot[,2]  ),4]
+hg[is.na(hg)] <- ""
+mm <- sparse.model.matrix(~0+hg)
+colnames(mm) <- gsub(".*hg","",colnames(mm))
+a <- t(mm) %*% a
+a <- a[-1,]
+a@x <- round(a@x)
+a <- drop0(a)
+dim(a)
+
+
+meta <- h5read(file_use,name = "col_attrs")
+meta <- do.call(cbind,meta)
+meta <- meta[!duplicated(gsub("[-.]","_",gsub("[-].*","",meta[,"CellID"]))),]
+rownames(meta) <-  gsub("[-.]","_",gsub("[-].*","",meta[,"CellID"]))
+meta <- data.frame(meta)
+meta$dataset <- "Zeisel2018"
+meta$sampleID <- gsub("[_]","w",gsub("[:].*","",rownames(meta)))
+meta$age <- "adult"
+meta <- meta[,-c(1:4)]
+rownames(meta) <- paste0( "Zeisel2018_", gsub("[:]","_",gsub("[_]","w",gsub("[-].*","",rownames(meta)))) )
+
+a <- a[,rownames(meta)]
+
+save_matrix_to_HDF5(a,"Zeisel2018/Zeisel2018_10X43w3_counts.h5")
+
+
+
+meta <- data.frame( row.names = "10X43w3" )
+meta$sample_id <- "10X43w3"
+meta$sample_name <- "adult_spine"
+meta$dataset <- "Zeisel2018"
+meta$database <- ""
+meta$acession_number <- ""
+meta$age <- "8w"
+meta$organism <- "Mus musculus"
+meta$organism_strain <- "CD1"
+meta$organism_genotype <- "WT"
+meta$disease <- "normal"
+meta$disease_detail <- "normal"
+meta$exp_condition_1 <- "normal"
+meta$exp_condition_2 <- ""
+meta$exp_condition_3 <- ""
+meta$tissue <- "spinal cord"
+meta$tissue_region <- "whole"
+meta$tissue_detail <- ""
+meta$technology <- "scRNAseq"
+meta$library_technology <- "10Xv3"
+meta$molecule <- "mRNA"
+write.csv(meta,"../CLEAN_DATA/Zeisel2018/Zeisel2018_metadata.csv",row.names = T)
+
+# plan(sequential)
+# a <- CreateSeuratObject(counts = a,meta.data = meta)
+# a <- NormalizeData(a,scale.factor = 1000)
+# a <- FindVariableFeatures( a , nfeatures = 3000)
+# a <- RunP( a , nfeatures = 3000)
+
+```
+
+
+# Sathyamurthy2018
+
+```{r}
+a <- read.delim("Sathyamurthy2018/GSE103892_Expression_Count_Matrix.txt",row.names = 1,header = T)
+a <- Matrix( as.matrix(a), sparse=T)
+
+metadata <- GEO_read_metadata("GSE103892")
+
+meta <- data.frame( row.names = metadata$Sample_geo_accession )
+meta$sample_id <- metadata$Sample_geo_accession
+meta$sample_name <- metadata$Sample_title
+meta$dataset <- "Sathyamurthy2018"
+meta$database <- "GEO"
+meta$acession_number <- "GSE103892"
+meta$age <- "8w"
+meta$organism <- metadata$Sample_organism_ch1
+meta$organism_strain <- "CD1"
+meta$organism_genotype <- "WT"
+meta$disease <- "normal"
+meta$disease_detail <- "normal"
+meta$exp_condition_1 <- gsub( ".*: ", "", metadata$Sample_characteristics_ch1)
+meta$exp_condition_2 <- ""
+meta$exp_condition_3 <- ""
+meta$tissue <- "spinal cord"
+meta$tissue_region <- "whole"
+meta$tissue_detail <- ""
+meta$technology <- "scRNAseq"
+meta$library_technology <- "Drop-Seq"
+meta$molecule <- "mRNA"
+write.csv(meta,"../CLEAN_DATA/Sathyamurthy2018/Sathyamurthy2018_metadata.csv",row.names = T)
+
+
+colnames(a) <- paste0("Sathyamurthy2018_",
+    meta$Sample_geo_accession[ match(gsub("_.*","",colnames(a)), meta$Sample_title)  ],
+         "_",gsub(".*_","",colnames(a)))
+
+meta1 <- read.delim("Sathyamurthy2018/GSE103892_Sample_Cell_Cluster_Information.txt",row.names = 1)
+dim(meta1)
+table(gsub("_.*","",rownames(meta1)))
+meta1 <- cbind(dataset = "Sathyamurthy2018",
+               sampleID = meta$Sample_geo_accession[ match(gsub("_.*","",rownames(meta1)),meta$Sample_title)  ],
+               sample_name = gsub("_.*","",rownames(meta1)),
+               meta1)
+rownames(meta1) <- paste0("Sathyamurthy2018_",
+    meta$Sample_geo_accession[ match(gsub("_.*","",rownames(meta1)), meta$Sample_title)  ],
+         "_",gsub(".*_","",rownames(meta1)))
+
+# meta$Sample_geo_accession[ match(gsub("_.*","",rownames(meta1)),meta$Sample_title)  ]
+
+hg <- mouse_human_annot[match( rownames(a) , mouse_human_annot[,2]  ),4]
+hg[is.na(hg)] <- ""
+mm <- sparse.model.matrix(~0+hg)
+colnames(mm) <- gsub(".*hg","",colnames(mm))
+a <- t(mm) %*% a
+a <- a[-1,]
+a@x <- round(a@x)
+a <- drop0(a)
+dim(a)
+
+for(i in unique(meta$sampleID)){
+  dir.create(paste0("Sathyamurthy2018/",i),recursive = T)
+  save_matrix_to_HDF5( a[ , meta1$sampleID == i ] , 
+    paste0("Sathyamurthy2018/",i,"/Sathyamurthy2018_",i,"_counts.h5"))}
+for(i in unique(meta1$sampleID)){
+  write.csv(meta1[ meta1$sampleID == i, ],
+    paste0("Sathyamurthy2018/",i,"/Sathyamurthy2018_",i,"_metadata.csv"),row.names = T) }
+```
+
+# Rosenberg2018
+
+```{r}
+metadata <- GEO_read_metadata(file_path = "../GEO_DATA/Rosenberg2018/GSE110823-GPL21626_series_matrix.txt")
+metadata <- metadata[2,]
+
+meta <- data.frame( row.names = metadata$Sample_geo_accession )
+meta$sample_id <- metadata$Sample_geo_accession
+meta$sample_name <- metadata$Sample_title
+meta$dataset <- "Rosenberg2018"
+meta$database <- "GEO"
+meta$acession_number <- "GSE110823"
+meta$age <- gsub( ".*: ", "", metadata$Sample_characteristics_ch1.2)
+meta$organism <- metadata$Sample_organism_ch1
+meta$organism_strain <- "C57BL/6 x DBA/2"
+meta$organism_genotype <- "WT"
+meta$disease <- "normal"
+meta$disease_detail <- "normal"
+meta$exp_condition_1 <- ""
+meta$exp_condition_2 <- ""
+meta$exp_condition_3 <- ""
+meta$tissue <- "spinal cord"
+meta$tissue_region <- "whole"
+meta$tissue_detail <- ""
+meta$technology <- "snRNAseq"
+meta$library_technology <- "SPLiT-seq"
+meta$molecule <- "mRNA"
+meta <- cbind( sample_id = paste0(meta[,1],".",c("P11brain","P11spine","P02brain","P02spine") ),meta[,-1] )
+rownames(meta) <- meta[,1]
+meta$age <- c("P11","P11","P02","P02")
+
+meta$tissue <- c("brain", "spinal cord","brain", "spinal cord")
+meta$sample_name <- paste0(meta$sample_name,"_",meta$age,"_",meta$tissue)
+
+write.csv(meta,"../CLEAN_DATA/Rosenberg2018/Rosenberg2018_metadata.csv",row.names = T)
+
+
+GEO_extract_raw_data("Rosenberg2018/GSE110823_RAW.tar")
+dl <- list.dirs("Rosenberg2018/GSE110823_RAW")[-1]
+for(i in dl){ system( paste0("gunzip ",list.files(i,full.names = T)) ) }
+for(i in dl){ system(paste0("tar -xvf ",list.files(i,full.names = T)," -C ",i) ) }
+for(i in dl){ system(paste0("rm -fr ",list.files(i,full.names = T,pattern = ".tar")) ) }
+system(paste0("chmod -R 755 ","Rosenberg2018/GSE110823_RAW"))
+for(i in dl){ system(paste0("mv $(ls ",list.files(i,full.names = T),"/*) ",i,"/") ) }
+for(i in dl){ system( paste0("rm -rf ",list.dirs(i,full.names = T)[-1]) ) }
+
+# a <- readMat("Rosenberg2018/GSE110823_RAW/GSM3017262/GSM3017262_same_day_cells_nuclei_3000_UBCs.mat")
+# a$DGE
+# a$barcodes
+# a$sample.type
+# a$genes
+# a$DGE
+
+dim(b$barcodes)
+dim(b$cluster.assignment)
+dim(b$sample.type)
+b$sample.type[1:10]
+b$barcodes[1:10]
+b$spinal.cluster.assignment[1:10]
+b <- readMat("../GEO_DATA/Rosenberg2018/GSE110823_RAW/GSM3017261/GSM3017261_150000_CNS_nuclei.mat")
+b$cluster.assignment[1:10]
+write.csv(data.frame(
+  barcodes=c(b$barcodes),
+  spinal.cluster.assignment=c(b$spinal.cluster.assignment),
+  cluster.assignment=b$cluster.assignment, 
+  sampletype=b$sample.type,
+  row.names = c(b$barcodes) ),
+  file = "../results/Rosenberg2018_cluster_metadata.csv",row.names = T)
+
+
+
+tissue <- gsub("2","02", gsub("_| ","", gsub("^p","P",c(b$sample.type)) ))
+a <- t( b$DGE )
+dim(a)
+colnames(a) <- paste0("Rosenberg2018_","GSM3017261.",tissue,"_cell", b$barcodes)
+rownames(a) <- gsub( " ","",b$genes)
+rownames(a) <- gsub( "[.].*","",c(rownames(a)))
+
+sum(duplicated(colnames(a)))
+
+table(mouse_annot$chromosome_name)
+chromossome <- mouse_annot[ match(rownames(a), mouse_annot$external_gene_name), "chromosome_name"]
+table(chromossome)
+perc_Y <- colSums(a[(chromossome == "Y") & (!is.na(chromossome)),]) / colSums(a)*100
+perc_X <- colSums(a[(chromossome == "X") & (!is.na(chromossome)),]) / colSums(a)*100
+perc_Yf <- colSums(a[(chromossome == "Y") & (!is.na(chromossome)),]>0) / colSums(a>0)*100
+perc_Xf <- colSums(a[(chromossome == "X") & (!is.na(chromossome)),]>0) / colSums(a>0)*100
+
+rafalib::mypar()
+plot(perc_X,perc_Y,cex=.2,
+     col= as.numeric(factor(gsub("_cell.*","",colnames(a)))))
+plot(perc_Xf,perc_Yf,cex=.2,
+     col= as.numeric(factor(gsub("_cell.*","",colnames(a)))))
+
+
+
+hg <- mouse_human_annot[match( rownames(a) , mouse_human_annot[,2]  ),4]
+hg[is.na(hg)] <- ""
+mm <- sparse.model.matrix(~0+hg)
+colnames(mm) <- gsub(".*hg","",colnames(mm))
+a <- t(mm) %*% a
+a <- a[-1,]
+a@x <- round(a@x)
+a <- drop0(a)
+dim(a)
+
+
+for(i in unique(gsub(".*_","",gsub("_cell.*","",colnames(a)))) ){
+  save_matrix_to_HDF5( a[ , grep(i,colnames(a)) ] , 
+    paste0("../CLEAN_DATA/Rosenberg2018/Rosenberg2018_",i,"_counts.h5"))}
+
+a <- read_h5("../CLEAN_DATA/Rosenberg2018/Rosenberg2018_GSM3017261.P02brain_counts.h5")
+colnames(a)
+save_matrix_to_HDF5(a,"Rosenberg2018/Rosenberg2018_counts.h5")
+write.csv2(meta[,-1],"Rosenberg2018/Rosenberg2018_metadata.csv",row.names = T)
+```
+
+# Rayon2021
+
+```{r}
+GEO_extract_raw_data("Rayon2021/GSE171892_RAW.tar")
+dl <- list.dirs("Rayon2021/GSE171892_RAW")[-1]
+for(i in dl){ system( paste0("gunzip ",list.files(i,full.names = T)) ) }
+for(i in dl){ system(paste0("tar -xvf ",list.files(i,full.names = T)," -C ",i) ) }
+for(i in dl){ system(paste0("rm -fr ",list.files(i,full.names = T,pattern = ".tar")) ) }
+system(paste0("chmod -R 755 ","Rayon2021/GSE171892_RAW"))
+for(i in dl){ system(paste0("mv $(ls ",list.files(i,full.names = T),"/*) ",i,"/") ) }
+for(i in dl){ system( paste0("rm -rf ",list.dirs(i,full.names = T)[-1]) ) }
+
+meta <- GEO_read_metadata(file_path = "../GEO_DATA/Rayon2021/GSE171892-GPL20301_series_matrix.txt")
+metadata <- rbind(meta,GEO_read_metadata(file_path = "../GEO_DATA/Rayon2021/GSE171892-GPL21103_series_matrix.txt"))
+# metadata <-  data.frame(meta)
+meta$Sample_organism_ch1
+
+meta <- data.frame( row.names = metadata$Sample_geo_accession )
+meta$sample_id <- metadata$Sample_geo_accession
+meta$sample_name <- metadata$Sample_title
+meta$dataset <- "Rayon2021"
+meta$database <- "GEO"
+meta$acession_number <- "GSE171892"
+meta$age <- gsub( ".*: ", "", metadata$Sample_characteristics_ch1 )
+meta$organism <- metadata$Sample_organism_ch1
+meta$organism_strain <- ifelse(metadata$Sample_organism_ch1 == "Mus musculus", "CD1", "")
+meta$organism_genotype <- ifelse(metadata$Sample_organism_ch1 == "Mus musculus", "WT", "")
+meta$disease <- "normal"
+meta$disease_detail <- "normal"
+meta$exp_condition_1 <- ""
+meta$exp_condition_2 <- ""
+meta$exp_condition_3 <- ""
+meta$tissue <- "spinal cord"
+meta$tissue_region <- gsub( ".*: ", "", metadata$Sample_characteristics_ch1.1 )
+meta$tissue_region[meta$tissue_region == "spinal cord"] <- "whole"
+meta$tissue_detail <- ""
+meta$technology <- "scRNAseq"
+meta$library_technology <- ifelse(meta$organism == "Mus musculus","10Xv2","10Xv3")
+meta$molecule <- "mRNA"
+write.csv(meta,"../CLEAN_DATA/Rayon2021/Rayon2021_metadata.csv",row.names = T)
+
+
+plan(multisession, workers=future::availableCores()-1 )
+dl <- list.dirs("../GEO_DATA/Rayon2021/GSE171892_RAW")[-1]
+future_lapply( dl , function(x){ 
+  zz <- gzfile(paste0(x,"/matrix.mtx.gz"),'rt')
+  a <- as(Matrix::readMM(zz),Class = "dgCMatrix")
+  
+  zz <- gzfile(paste0(x,"/barcodes.tsv.gz"),'rt')
+  colnames(a) <- as.character(read.table(zz)[,1])
+  colnames(a) <- paste0("Rayon2021_",gsub(".*[/]","",x),"_",gsub("[-].*","",colnames(a)))
+  
+  zz <- gzfile(paste0(x,"/features.tsv.gz"),'rt')
+  rownames(a) <- as.character(read.table(zz)[,2])
+  
+  meta <- data.frame(aa = colnames(a),
+                     dataset="Rayon2021",
+                     sampleID= gsub(".*[/]","",x),
+                     species= meta$Sample_organism_ch1 [ meta$Sample_geo_accession == gsub(".*[/]","",x)  ],
+                     age=gsub(".*[ ]","",meta$Sample_characteristics_ch1) [ meta$Sample_geo_accession == gsub(".*[/]","",x)  ],
+                     region=gsub("tissue:[ ]","", meta$Sample_characteristics_ch1.1) [ meta$Sample_geo_accession == gsub(".*[/]","",x)  ],
+                     row.names = colnames(a))
+  
+  save_matrix_to_HDF5(a,paste0(x,"/Rayon2021_",gsub(".*[/]","",x),"_counts.h5"))
+  write.csv2(meta[,-1],paste0(x,"/Rayon2021_",gsub(".*[/]","",x),"_metadata.csv"),row.names = T)
+})
+
+
+for(i in dl){ system( paste0("rm -rf ",i,"/*.gz") ) }
+mmm <- setNames( meta$organism , meta$sample_id )
+
+for( i in names(mmm[mmm == "Mus musculus"]) ){
+  a <- read_h5(paste0("../GEO_DATA/Rayon2021/",i,"/Rayon2021_",i,"_counts.h5") )
+  hg <- mouse_human_annot[match( rownames(a) , mouse_human_annot[,2]  ),4]
+  hg[is.na(hg)] <- ""
+  
+  mm <- sparse.model.matrix(~0+hg)
+  colnames(mm) <- gsub(".*hg","",colnames(mm))
+  aa <- t(mm) %*% a
+  aa <- aa[-1,]
+  aa@x <- round(aa@x)
+  aa <- drop0(aa)
+  dim(aa)
+  
+  save_matrix_to_HDF5(aa,paste0("../GEO_DATA/Rayon2021_",gsub(".*[/]","",i),"_counts.h5"))
+}
+
+```
+
+
+# Milich2021
+
+```{r}
+metadata <- GEO_read_metadata("GSE162610")
+metadata
+
+meta <- data.frame( row.names = metadata$Sample_geo_accession )
+meta$sample_id <- metadata$Sample_geo_accession
+meta$sample_name <- metadata$Sample_title
+meta$dataset <- "Milich2021"
+meta$database <- "GEO"
+meta$acession_number <- "GSE162610"
+meta$age <- "8w"
+meta$organism <- "Mus musculus"
+meta$organism_strain <- "C57BL/6"
+meta$organism_genotype <- "WT"
+meta$disease <- "normal"
+meta$disease_detail <- gsub( ".*: ", "", metadata$Sample_characteristics_ch1.1 )
+meta$disease_detail[meta$disease_detail == "Uninjured"] <- "normal"
+meta$disease[meta$disease_detail != "normal"] <- "injured"
+meta$exp_condition_1 <- ""
+meta$exp_condition_2 <- ""
+meta$exp_condition_3 <- ""
+meta$tissue <- "spinal cord"
+meta$tissue_region <- "whole"
+meta$tissue_detail <- ""
+meta$technology <- "scRNAseq"
+meta$library_technology <- "10Xv2"
+meta$molecule <- "mRNA"
+write.csv(meta,"../CLEAN_DATA/Millich2021/Millich2021_metadata.csv",row.names = T)
+
+
+a <- as(Matrix::readMM("Milich2021/GSE162610_sci_mat.mtx"),Class = "dgCMatrix")
+tt1 <- read.table("Milich2021/GSE162610_gene_metadata.tsv")
+rownames(a) <- tt1$ensembl_gene_id
+
+hg <- mouse_human_annot[match( rownames(a) , mouse_human_annot[,1]  ),4]
+hg[is.na(hg)] <- ""
+
+mm <- sparse.model.matrix(~0+hg)
+colnames(mm) <- gsub(".*hg","",colnames(mm))
+aa <- t(mm) %*% a
+aa <- aa[-1,]
+aa@x <- round(aa@x)
+aa <- drop0(aa)
+dim(aa)
+
+tt2 <- read.table("Milich2021/GSE162610_barcodes.tsv")[,1]
+tt2 <- paste0( "Milich2021_",meta[match( sub(".*[ATCG]_","",tt2) , meta$Sample_title),"Sample_geo_accession"],"_",
+               gsub("_.*","",tt2))
+colnames(aa) <- tt2
+
+for(i in unique( gsub("_.*","",gsub("Milich2021_","",colnames(aa))) )){
+  a <- aa[,grep(i,colnames(aa))]
+  dir.create(paste0("Milich2021/",i),recursive = T)
+  save_matrix_to_HDF5(a,paste0("Milich2021/",i,"/Milich2021_",i,"_counts.h5"))
+}
+
+tt3 <- read.table("Milich2021/GSE162610_barcode_metadata.tsv")
+rownames(tt3) <- paste0("Milich2021_",meta[match( tt3$orig.ident,meta$Sample_title ),"Sample_geo_accession"],"_",gsub("_.*","",rownames(tt3)))
+tt3 <- cbind(dataset="Milich2021", samplID = gsub("_.*","",gsub("Milich2021_","",colnames(aa))), tt3)
+
+for(i in unique( gsub("_.*","",gsub("Milich2021_","",colnames(aa))) )){
+  write.csv2( tt3[grep(i,rownames(tt3)),] , paste0("Milich2021/",i,"/Milich2021_",i,"_metadata.csv"))
+}
+
+table(tt3$orig.ident,tt3$sample_id)
+
+meta$Sample_title
+meta$Sample_geo_accession
+```
+
+# Delile2019
+
+```{r}
+a <- readMM("../GEO_DATA/Delile2019/E-MTAB-7320.aggregated_filtered_counts.mtx")
+a <- as( a , Class = "dgCMatrix" )
+dim(a)
+colnames(a) <- read.delim("../GEO_DATA/Delile2019/E-MTAB-7320.aggregated_filtered_counts.mtx_cols",header = F)[,1]
+rownames(a) <- read.delim("Delile2019/E-MTAB-7320.aggregated_filtered_counts.mtx_rows",header = F)[,2]
+colnames(a) <- paste0( "Delile2019_", gsub("[-]","_",colnames(a)))
+
+metadata <- read.delim("../GEO_DATA/Delile2019/metadata.txt")
+
+meta <- read.delim("../GEO_DATA/Delile2019/E-MTAB-7320.clusters.tsv")
+rownames(meta) <- paste0( "cluster_k_", meta[,2] )
+meta <- t(meta)[-c(1:2),]
+rownames(meta) <- paste0( "Delile2019_",gsub( "[.]","_",rownames(meta) ))
+dim(meta)
+meta <- meta[ colnames(a) ,]
+table(gsub( "[-].*","", colnames(a) ))
+meta <- cbind(dataset="Delile2019",sampleID=gsub( "[_].*","",  gsub("Delile2019_","", colnames(a) )),meta)
+meta <- data.frame(meta)
+# meta$sampleID <- gsub("[_].*","",meta$sampleID)
+
+hg <- mouse_human_annot[match( rownames(a) , mouse_human_annot[,1]  ),4]
+hg[is.na(hg)] <- ""
+
+mm <- sparse.model.matrix(~0+hg)
+colnames(mm) <- gsub(".*hg","",colnames(mm))
+aa <- t(mm) %*% a
+aa <- aa[-1,]
+aa@x <- round(aa@x)
+aa <- drop0(aa)
+dim(aa)
+
+metadata <- read.delim("../GEO_DATA/Delile2019/metadata.txt")
+meta <- data.frame( row.names = metadata$Comment.ENA_RUN. )
+meta$sample_id <- metadata$Comment.ENA_RUN.
+meta$sample_name <- metadata$Source.Name
+meta$dataset <- "Delile2019"
+meta$database <- "ENA"
+meta$acession_number <- "E-MTAB-7320"
+meta$age <- metadata$Characteristics.developmental.stage.
+meta$age <- gsub(".*[ ]","E",meta$age)
+meta$organism <- "Mus musculus"
+meta$organism_strain <- "CD1"
+meta$organism_genotype <- "WT"
+meta$disease <- "normal"
+meta$disease_detail <- "normal"
+meta$exp_condition_1 <- ""
+meta$exp_condition_2 <- ""
+meta$exp_condition_3 <- ""
+meta$tissue <- "spinal cord"
+meta$tissue_region <- "cervical and thoracic"
+meta$tissue_detail <- ""
+meta$technology <- "scRNAseq"
+meta$library_technology <- "10Xv2"
+meta$molecule <- "mRNA"
+
+write.csv(meta,"../CLEAN_DATA/Delile2019/Delile2019_metadata.csv",row.names = T)
+
+
+# a <- read_h5("Delile2019/Delile2019_counts.h5")
+save_matrix_to_HDF5(a,"Delile2019/Delile2019_counts.h5")
+for(i in unique(meta$sampleID)){
+  dir.create(paste0("Delile2019/",i),recursive = T)
+  save_matrix_to_HDF5( aa[ , meta$sampleID == i ] , paste0("Delile2019/",i,"/Delile2019_",i,"_counts.h5"))}
+for(i in unique(meta$sampleID)){
+  write.csv(meta[ meta$sampleID == i, ],paste0("Delile2019/",i,"/Delile2019_",i,"_metadata.csv"),row.names = T) }
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
+
+```{r}
+# 
+# 
+# rename_10x(list.dirs("Zhang2021")[-1])
+# 
+# plan(multisession, workers=future::availableCores()-1 )
+# dl <- list.dirs("Zhang2021")[-1]
+# future_lapply( dl , function(x){ 
+#   a <- NULL ; tt1 <- NULL ; tt2 <- NULL
+#   
+#   a <- try( as(Matrix::readMM( gzfile(paste0(x,"/matrix.mtx.gz"),'rt') ),Class = "dgCMatrix") )
+#   if(file.exists(paste0(x,"/matrix.mtx.gz"))){
+#   a <- try( as(Matrix::readMM( paste0(x,"/matrix.mtx") ),Class = "dgCMatrix") ) }
+#   
+#   if(!is.null(a)){
+#     tt1 <- try( read.table(gzfile(paste0(x,"/barcodes.tsv.gz"),'rt')) )
+#     tt2 <- try( read.table(gzfile(paste0(x,"/features.tsv.gz"),'rt')) )
+#   
+#     if( nrow(tt1) > nrow(tt2)){
+#       rownames(a) <- as.character(tt1[,2])
+#       colnames(a) <- as.character(tt2[,1])
+#     } else {
+#       rownames(a) <- as.character(tt2[,1])
+#       colnames(a) <- as.character(tt1[,2])
+#     }
+#     save_matrix_to_HDF5(a,paste0(x,"/",gsub(".*[/]","",x),".h5"))
+#   } else { print(paste0(x," FAILED")) }
+# })
+# 
+# meta <- read_GEO_metadata("Zhang2021/GSE136719_series_matrix.txt")
+
+# lf <- list.files(path = "Zhang2021/GSE136719_RAW", full.names = T,pattern = "[.]gz",recursive = T)
+# file.remove(lf)
+```
+
+
+
+
+```{r}
+file_list <- list.files(PATH_DATA, pattern = "counts.h5",full.names = T,recursive = T)
+
+meta_list <- list.files(PATH_DATA, pattern = "metadata.csv",full.names = T,recursive = T)
+meta_list <- lapply(meta_list, function(x){ read.csv(x,row.names = 1)})
+meta_list <- do.call(rbind,meta_list)
+dim(meta_list)
+
+```
+
+
+
+
