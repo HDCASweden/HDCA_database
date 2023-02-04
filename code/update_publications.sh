@@ -3,6 +3,7 @@ source /home/ubuntu/HDD/opt/miniforge3/etc/profile.d/conda.sh
 source ~/.bash_profile
 wait
 conda activate dotfiles
+git pull
 
 cd ~/repos/HDCA_database/code
 
@@ -34,3 +35,9 @@ echo 'Erik Sundstrom'
 esearch -db pubmed -query 'Erik Sundstrom' | efetch -format abstract > ../data/publications/ES.txt
 
 Rscript ./get_pubmed_info.R
+
+git add .
+git commit -m "$(echo 'updates citations ('`date +"%m-%d-%y-%T"`')')"
+git push
+
+
