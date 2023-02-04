@@ -1,6 +1,7 @@
 
 
 
+suppressMessages(suppressWarnings({
 
 # Function to format article list
 reformat_journal_name <- function(journals){
@@ -31,11 +32,9 @@ JA <- data.frame(
   JournalTitle = reformat_journal_name(gsub("JournalTitle: ","",JA[grep("JournalTitle",JA)])),
   IsoAbbr = reformat_journal_name(gsub("IsoAbbr: ","",JA[grep("IsoAbbr",JA)])) )
 
-
 # Get journal Impact Factor
 IF <- as.data.frame(readxl::read_xlsx("../data/2020ImpactFactordetail.xlsx",skip = 2))
 IF$journal_name <- reformat_journal_name(IF$`Full Journal Title`)
-
 # Read in output from 'abstract'
 # esearch -db pubmed -query 'Joakim Lundeberg' | efetch -format abstract > ../data/publications/JL.txt
 file_list <- list.files("../data/publications",full.names = T,pattern = ".txt")
@@ -109,7 +108,6 @@ tmp <- lapply( file_list , function(i){
 })
 names(tmp) <- file_list
 
-
 # Remove bad-formated or less relevant entries
 tmp <- lapply( tmp , function( i ){
   # Filter publications
@@ -131,10 +129,11 @@ lapply( names(tmp) , function( i ){
 
 # Merge all publications and export
 tmp2 <- do.call(rbind,tmp)
-tmp2 <- tmp2[order(as.numeric(tmp2$YEAR),decreasing = T),]
+tmp2 <- tmp2[order(as.numeric(tmp2$PMID),decreasing = T),]
 rownames(tmp2) <- 1:nrow(tmp2)
 write.csv(tmp2,"../compiled/publications/paper_news.csv")
 
 
+}))
 
 #
